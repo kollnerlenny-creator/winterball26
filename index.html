@@ -16,7 +16,6 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .product-card:active { transform: scale(0.96); }
-        .product-card.out-of-stock { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
 
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
@@ -38,21 +37,18 @@
             transition: all 0.1s;
         }
         .num-btn:active { background-color: #334155; transform: scale(0.95); }
-
-        .cfd-area { fill: rgba(79, 70, 229, 0.2); stroke: #6366f1; stroke-width: 2; }
-        .cfd-grid { stroke: #334155; stroke-dasharray: 4; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
 
-    <!-- === SCREENSAVER === -->
+    <!-- === SCREENSAVER (MAIN) === -->
     <div id="screensaver" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center hidden transition-opacity duration-500 cursor-pointer">
         <div class="text-center animate-pulse-glow">
             <div class="bg-indigo-600 w-32 h-32 rounded-3xl mx-auto flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-8">
                 <i data-lucide="snowflake" class="text-white w-20 h-20"></i>
             </div>
             <h1 class="text-5xl font-black text-white tracking-tight mb-2">Winterball 2026</h1>
-            <p class="text-2xl text-indigo-400 font-medium tracking-widest uppercase">Kasse</p>
+            <p id="screensaverSubtitle" class="text-2xl text-indigo-400 font-medium tracking-widest uppercase">GETRÄNKE</p>
         </div>
         <p class="absolute bottom-10 text-slate-500 text-sm animate-bounce">Zum Aufwecken tippen</p>
     </div>
@@ -64,12 +60,13 @@
                 <div class="bg-indigo-600 p-1.5 rounded-lg">
                     <i data-lucide="snowflake" class="text-white w-5 h-5"></i>
                 </div>
-                <h1 class="text-lg font-bold text-white">Winterball <span class="text-indigo-400">2026</span></h1>
+                <h1 class="text-lg font-bold text-white">Winterball <span class="text-indigo-400">System</span></h1>
+                <div id="activePosIndicator" class="ml-2 px-2 py-0.5 bg-slate-800 rounded text-[10px] font-bold text-indigo-400 border border-indigo-500/30 uppercase tracking-widest">GETRÄNKE</div>
             </div>
             
             <nav class="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700/50">
                 <button onclick="setView('order')" id="nav-order" class="px-4 py-1.5 text-sm font-medium rounded-lg transition-all bg-indigo-600 text-white">Verkauf</button>
-                <button onclick="setView('customer')" id="nav-customer" class="px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Kundenansicht</button>
+                <button onclick="setView('customer-select')" id="nav-customer-select" class="px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Kundenansicht</button>
                 <button onclick="setView('dashboard')" id="nav-dashboard" class="px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Dashboard</button>
                 <button onclick="setView('history')" id="nav-history" class="px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Historie</button>
                 <button onclick="tryInventoryAccess()" id="nav-inventory" class="px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Inventar</button>
@@ -88,6 +85,10 @@
         <!-- VIEW: VERKAUF -->
         <section id="orderView" class="view-section h-full flex flex-col md:flex-row gap-0 md:gap-6 p-2 md:p-6">
             <div class="flex-1 flex flex-col min-h-0">
+                <div class="flex gap-2 mb-4 bg-slate-800/30 p-1 rounded-xl w-fit border border-slate-700/50">
+                    <button onclick="setPOS(1)" id="pos-btn-1" class="px-4 py-2 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white">GETRÄNKE</button>
+                    <button onclick="setPOS(2)" id="pos-btn-2" class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-400">SPEISEN</button>
+                </div>
                 <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 overflow-y-auto custom-scrollbar pr-2 pb-24"></div>
             </div>
 
@@ -109,42 +110,50 @@
             </div>
         </section>
 
-        <!-- VIEW: KUNDENANSICHT -->
+        <!-- VIEW: KUNDENANSICHT SELECTION -->
+        <section id="customer-selectView" class="view-section hidden h-full flex flex-col items-center justify-center p-10">
+            <h2 class="text-3xl font-black text-white mb-8">Kundenansicht öffnen für:</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+                <button onclick="openCustomerView(1)" class="bg-slate-800 hover:bg-indigo-600 border border-slate-700 p-10 rounded-3xl group transition-all">
+                    <i data-lucide="cup-soda" class="w-12 h-12 text-indigo-400 group-hover:text-white mb-4 mx-auto"></i>
+                    <span class="block text-2xl font-bold text-white">Kasse GETRÄNKE</span>
+                    <span class="text-slate-500 group-hover:text-indigo-200 text-sm">Synchronisiert mit Getränke-Kasse</span>
+                </button>
+                <button onclick="openCustomerView(2)" class="bg-slate-800 hover:bg-indigo-600 border border-slate-700 p-10 rounded-3xl group transition-all">
+                    <i data-lucide="utensils" class="w-12 h-12 text-indigo-400 group-hover:text-white mb-4 mx-auto"></i>
+                    <span class="block text-2xl font-bold text-white">Kasse SPEISEN</span>
+                    <span class="text-slate-500 group-hover:text-indigo-200 text-sm">Synchronisiert mit Speisen-Kasse</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW: KUNDENANSICHT (LIVE) -->
         <section id="customerView" class="view-section hidden h-full w-full bg-slate-950 flex flex-col items-center justify-center relative">
             <button onclick="setView('order')" class="absolute top-4 right-4 z-[60] p-2 text-slate-800 hover:text-slate-600 transition-colors">
                 <i data-lucide="log-out" class="w-6 h-6"></i>
             </button>
-
             <div id="customerScreensaver" class="absolute inset-0 bg-slate-950 z-20 flex flex-col items-center justify-center transition-opacity duration-700">
                 <div class="text-center animate-pulse-glow">
                     <div class="bg-indigo-600 w-40 h-40 rounded-[2.5rem] mx-auto flex items-center justify-center shadow-2xl shadow-indigo-500/20 mb-10">
                         <i data-lucide="snowflake" class="text-white w-24 h-24"></i>
                     </div>
                     <h1 class="text-6xl font-black text-white tracking-tighter mb-4">Winterball 2026</h1>
-                    <p class="text-2xl text-slate-500 font-medium">Willkommen!</p>
+                    <p id="custSaverSubtitle" class="text-3xl text-indigo-400 font-bold uppercase tracking-widest">Kasse Getränke</p>
                 </div>
             </div>
-
             <div class="w-full max-w-4xl p-8 flex flex-col h-full z-10">
                 <div class="flex justify-between items-center mb-12">
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
-                            <i data-lucide="shopping-cart" class="text-white w-6 h-6"></i>
-                        </div>
+                        <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center"><i data-lucide="shopping-cart" class="text-white w-6 h-6"></i></div>
                         <h2 class="text-4xl font-black text-white">Deine Bestellung</h2>
                     </div>
-                    <div class="text-slate-500 font-bold uppercase tracking-widest text-sm">Kasse #1</div>
+                    <div id="customerPosTag" class="text-indigo-500 font-bold uppercase tracking-widest text-lg">GETRÄNKE</div>
                 </div>
-
                 <div id="customerCartItems" class="flex-grow space-y-6 overflow-y-auto custom-scrollbar pr-4"></div>
-
                 <div class="mt-12 pt-10 border-t border-slate-800 flex justify-between items-end">
                     <div>
                         <p class="text-slate-500 font-bold uppercase tracking-widest mb-2">Gesamtsumme</p>
                         <p id="customerTotal" class="text-9xl font-black text-white tracking-tighter">0,00 €</p>
-                    </div>
-                    <div class="bg-indigo-500/10 border border-indigo-500/20 px-8 py-4 rounded-3xl text-indigo-400 font-bold text-xl animate-pulse">
-                        Bitte an der Kasse zahlen
                     </div>
                 </div>
             </div>
@@ -167,52 +176,19 @@
                         <h3 class="text-3xl font-black text-sky-400" id="statCount">0</h3>
                     </div>
                 </div>
-
-                <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700">
-                    <h3 class="font-bold text-white text-lg mb-6 flex items-center gap-2">
-                        <i data-lucide="line-chart" class="text-indigo-400 w-5 h-5"></i> 
-                        Verkaufsfluss (CFD)
-                    </h3>
-                    <div class="h-64 w-full relative">
-                        <svg id="cfdChart" class="w-full h-full overflow-visible"></svg>
-                    </div>
-                </div>
-
+                
                 <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>
                             <h3 class="font-bold text-white text-lg flex items-center gap-2">
                                 <i data-lucide="shopping-cart" class="text-indigo-400 w-5 h-5"></i> 
-                                Wareneinkauf
+                                Wareneinkauf / Ausgaben
                             </h3>
-                            <p class="text-slate-500 text-sm mt-1">Ausgaben für den Bestand.</p>
+                            <p class="text-xs text-slate-500 mt-1">Hier die Gesamtkosten aller Einkäufe eintragen.</p>
                         </div>
                         <div class="flex items-center gap-3">
-                            <div class="relative">
-                                <input type="number" id="expenseInput" step="0.01" placeholder="0.00" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono text-xl w-40 outline-none focus:border-indigo-500 transition-all">
-                                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">€</span>
-                            </div>
-                            <button onclick="saveExpenses()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3.5 rounded-xl shadow-lg transition-all">Speichern</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700">
-                        <h3 class="font-bold text-white mb-6">Top Produkte</h3>
-                        <div id="topProductsChart" class="space-y-4"></div>
-                    </div>
-                    <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700">
-                        <h3 class="font-bold text-white mb-6">Zusammenfassung</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between py-2 border-b border-slate-700/50">
-                                <span class="text-slate-400 text-rose-400">Einkaufskosten (-)</span>
-                                <span id="displayExpenses" class="text-rose-400 font-bold">0,00 €</span>
-                            </div>
-                            <div class="flex justify-between py-2">
-                                <span class="text-slate-400">Durchschn. Bon</span>
-                                <span id="statAvg" class="text-white font-bold">0,00 €</span>
-                            </div>
+                            <input type="number" id="expenseInput" step="0.01" placeholder="0.00" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono text-xl w-40 outline-none">
+                            <button onclick="saveExpenses()" class="bg-indigo-600 px-6 py-3.5 rounded-xl font-bold hover:bg-indigo-500 transition-colors">Speichern</button>
                         </div>
                     </div>
                 </div>
@@ -222,10 +198,11 @@
         <!-- VIEW: HISTORIE -->
         <section id="historyView" class="view-section hidden h-full overflow-y-auto p-6 md:p-10">
             <div class="max-w-3xl mx-auto">
-                <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                    <i data-lucide="history" class="text-indigo-400"></i> Buchungsverlauf
-                </h2>
-                <div id="historyList" class="space-y-4 pb-20"></div>
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-3"><i data-lucide="history" class="text-indigo-400"></i> Buchungsverlauf</h2>
+                    <span id="historyCount" class="bg-slate-800 px-4 py-1.5 rounded-full text-slate-400 text-sm font-medium">0 Buchungen</span>
+                </div>
+                <div id="historyList" class="space-y-4 pb-32"></div>
             </div>
         </section>
 
@@ -234,30 +211,47 @@
             <div class="max-w-3xl mx-auto space-y-8">
                 <div class="flex justify-between items-center">
                     <h2 class="text-2xl font-bold text-white">Bestandsverwaltung</h2>
-                    <button onclick="showConfirm('Alles löschen?', 'Daten werden zurückgesetzt.', resetApp)" class="text-xs bg-rose-500/10 text-rose-500 px-3 py-1.5 rounded-lg border border-rose-500/20">System Reset</button>
+                    <button onclick="showConfirm('Alles löschen?', 'Alle Verkäufe und Bestände werden entfernt!', resetApp)" class="text-xs bg-rose-500/10 text-rose-500 px-3 py-1.5 rounded-lg border border-rose-500/20">System Reset</button>
                 </div>
-
                 <div class="bg-slate-800 p-6 rounded-2xl border border-indigo-500/30">
                     <h3 id="formTitle" class="text-sm font-bold text-indigo-400 uppercase tracking-widest mb-4">Neuer Artikel</h3>
+                    
+                    <div class="flex gap-4 mb-4 bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                        <span class="text-sm font-bold text-slate-400 my-auto flex items-center gap-2"><i data-lucide="monitor" class="w-4 h-4"></i> Verfügbar auf:</span>
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input type="radio" name="invPos" value="0" checked class="accent-indigo-500 w-4 h-4">
+                                <span class="text-white text-sm font-medium group-hover:text-indigo-300 transition-colors">Alle</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input type="radio" name="invPos" value="1" class="accent-indigo-500 w-4 h-4">
+                                <span class="text-white text-sm font-medium group-hover:text-indigo-300 transition-colors">Getränke</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input type="radio" name="invPos" value="2" class="accent-indigo-500 w-4 h-4">
+                                <span class="text-white text-sm font-medium group-hover:text-indigo-300 transition-colors">Speisen</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <input type="text" id="invName" placeholder="Produktname" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none">
+                        <input type="text" id="invName" placeholder="Produktname" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 transition-colors">
                         <div class="flex items-center gap-3 px-4 bg-slate-900 rounded-xl border border-slate-700">
-                            <input type="checkbox" id="invHasVar" onchange="toggleInvInputs()" class="w-5 h-5">
-                            <label for="invHasVar" class="text-sm text-slate-400">Varianten (S/L)</label>
+                            <input type="checkbox" id="invHasVar" onchange="toggleInvInputs()" class="w-5 h-5 accent-indigo-500">
+                            <label for="invHasVar" class="text-sm text-slate-400 font-medium cursor-pointer select-none">Varianten (S/L)</label>
                         </div>
                     </div>
                     <div id="invSingleInputs" class="grid grid-cols-2 gap-4 mb-4">
-                        <input type="number" id="invPrice" placeholder="Preis €" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none">
-                        <input type="number" id="invStock" placeholder="Vorrat" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none">
+                        <input type="number" id="invPrice" placeholder="Preis €" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 transition-colors">
+                        <input type="number" id="invStock" placeholder="Vorrat" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 transition-colors">
                     </div>
                     <div id="invVarInputs" class="hidden grid grid-cols-2 gap-4 mb-4 p-4 bg-slate-900/50 rounded-xl border border-slate-700">
                         <div class="space-y-2"><p class="text-xs font-bold text-slate-500">Klein (S)</p><input type="number" id="invPriceS" placeholder="€" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"><input type="number" id="invStockS" placeholder="Vorrat" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"></div>
                         <div class="space-y-2"><p class="text-xs font-bold text-slate-500">Groß (L)</p><input type="number" id="invPriceL" placeholder="€" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"><input type="number" id="invStockL" placeholder="Vorrat" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"></div>
                     </div>
-                    <button id="saveBtn" onclick="saveProduct()" class="w-full bg-emerald-600 py-3.5 rounded-xl text-white font-bold">Speichern</button>
-                    <button id="cancelEditBtn" onclick="resetForm()" class="hidden w-full mt-2 text-slate-500 py-2">Abbrechen</button>
+                    <button id="saveBtn" onclick="saveProduct()" class="w-full bg-emerald-600 py-3.5 rounded-xl text-white font-bold hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-500/20">Speichern</button>
+                    <button id="cancelEditBtn" onclick="resetForm()" class="hidden w-full mt-2 text-slate-500 py-2 hover:text-white transition-colors">Abbrechen</button>
                 </div>
-
                 <div id="inventoryList" class="space-y-3"></div>
             </div>
         </section>
@@ -267,10 +261,8 @@
     <div id="pinModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl hidden z-[80] flex items-center justify-center p-4 transition-all opacity-0">
         <div class="max-w-sm w-full space-y-8">
             <div class="text-center">
-                <div class="bg-slate-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-700">
-                    <i data-lucide="lock" class="text-indigo-400 w-6 h-6"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-white">Zugriff geschützt</h2>
+                <div class="bg-slate-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-700"><i data-lucide="lock" class="text-indigo-400 w-6 h-6"></i></div>
+                <h2 class="text-2xl font-bold text-white">PIN erforderlich</h2>
                 <div class="flex justify-center gap-4 mt-6">
                     <div id="pinDot1" class="w-4 h-4 rounded-full border-2 border-slate-700"></div>
                     <div id="pinDot2" class="w-4 h-4 rounded-full border-2 border-slate-700"></div>
@@ -279,36 +271,20 @@
                 </div>
             </div>
             <div class="grid grid-cols-3 gap-3">
-                <button onclick="addPin(1)" class="num-btn">1</button>
-                <button onclick="addPin(2)" class="num-btn">2</button>
-                <button onclick="addPin(3)" class="num-btn">3</button>
-                <button onclick="addPin(4)" class="num-btn">4</button>
-                <button onclick="addPin(5)" class="num-btn">5</button>
-                <button onclick="addPin(6)" class="num-btn">6</button>
-                <button onclick="addPin(7)" class="num-btn">7</button>
-                <button onclick="addPin(8)" class="num-btn">8</button>
-                <button onclick="addPin(9)" class="num-btn">9</button>
-                <button onclick="closeModal('pinModal')" class="num-btn text-rose-500"><i data-lucide="x" class="mx-auto"></i></button>
-                <button onclick="addPin(0)" class="num-btn">0</button>
-                <button onclick="clearPin()" class="num-btn text-slate-400"><i data-lucide="delete" class="mx-auto"></i></button>
+                <button onclick="addPin(1)" class="num-btn">1</button><button onclick="addPin(2)" class="num-btn">2</button><button onclick="addPin(3)" class="num-btn">3</button>
+                <button onclick="addPin(4)" class="num-btn">4</button><button onclick="addPin(5)" class="num-btn">5</button><button onclick="addPin(6)" class="num-btn">6</button>
+                <button onclick="addPin(7)" class="num-btn">7</button><button onclick="addPin(8)" class="num-btn">8</button><button onclick="addPin(9)" class="num-btn">9</button>
+                <button onclick="closeModal('pinModal')" class="num-btn text-rose-500"><i data-lucide="x" class="mx-auto"></i></button><button onclick="addPin(0)" class="num-btn">0</button><button onclick="clearPin()" class="num-btn text-slate-400"><i data-lucide="delete" class="mx-auto"></i></button>
             </div>
         </div>
     </div>
 
     <div id="sizeModal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md hidden z-[60] flex items-center justify-center p-4 transition-all opacity-0">
         <div class="bg-slate-800 rounded-3xl p-8 max-w-sm w-full border border-slate-700">
-            <h3 id="sizeModalTitle" class="text-2xl font-bold text-white text-center mb-8">Größe wählen</h3>
+            <h3 class="text-2xl font-bold text-white text-center mb-8">Größe wählen</h3>
             <div class="grid grid-cols-2 gap-4">
-                <button onclick="chooseSize('small')" class="bg-slate-700 rounded-2xl p-6 flex flex-col items-center gap-2">
-                    <i data-lucide="cup-soda" class="w-8 h-8 text-indigo-400"></i>
-                    <span class="font-bold text-white">KLEIN</span>
-                    <span id="priceSDisplay" class="text-indigo-300">0.00€</span>
-                </button>
-                <button onclick="chooseSize('large')" class="bg-slate-700 rounded-2xl p-6 flex flex-col items-center gap-2">
-                    <i data-lucide="beer" class="w-8 h-8 text-indigo-400"></i>
-                    <span class="font-bold text-white">GROSS</span>
-                    <span id="priceLDisplay" class="text-indigo-300">0.00€</span>
-                </button>
+                <button onclick="chooseSize('small')" class="bg-slate-700 rounded-2xl p-6 flex flex-col items-center gap-2"><i data-lucide="cup-soda" class="w-8 h-8 text-indigo-400"></i><span class="font-bold text-white">KLEIN</span><span id="priceSDisplay" class="text-indigo-300">0.00€</span></button>
+                <button onclick="chooseSize('large')" class="bg-slate-700 rounded-2xl p-6 flex flex-col items-center gap-2"><i data-lucide="beer" class="w-8 h-8 text-indigo-400"></i><span class="font-bold text-white">GROSS</span><span id="priceLDisplay" class="text-indigo-300">0.00€</span></button>
             </div>
             <button onclick="closeModal('sizeModal')" class="w-full mt-8 text-slate-500">Abbrechen</button>
         </div>
@@ -317,55 +293,31 @@
     <div id="paymentModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-2xl hidden z-[70] flex items-center justify-center p-4 transition-all opacity-0">
         <div class="max-w-4xl w-full bg-slate-900 rounded-3xl border border-slate-700 flex flex-col md:flex-row overflow-hidden">
             <div class="p-8 md:w-2/5 border-r border-slate-800 flex flex-col justify-between">
-                <div>
-                    <h2 id="payTotalDisplay" class="text-6xl font-black text-white mb-6">0,00 €</h2>
+                <div><h2 id="payTotalDisplay" class="text-6xl font-black text-white mb-6">0,00 €</h2>
                     <div class="space-y-4">
-                        <div class="bg-slate-800 p-4 rounded-xl">
-                            <p class="text-xs text-slate-500 uppercase mb-1">Gegeben</p>
-                            <div class="text-4xl font-mono font-bold text-white text-right" id="payInputDisplay">0 €</div>
-                        </div>
-                        <div class="bg-slate-800 p-4 rounded-xl">
-                            <p class="text-xs text-slate-500 uppercase mb-1">Rückgeld</p>
-                            <div class="text-4xl font-mono font-bold text-emerald-400 text-right" id="changeDisplay">0,00 €</div>
-                        </div>
+                        <div class="bg-slate-800 p-4 rounded-xl"><p class="text-xs text-slate-500 uppercase mb-1">Gegeben</p><div class="text-4xl font-mono font-bold text-white text-right" id="payInputDisplay">0 €</div></div>
+                        <div class="bg-slate-800 p-4 rounded-xl"><p class="text-xs text-slate-500 uppercase mb-1">Rückgeld</p><div class="text-4xl font-mono font-bold text-emerald-400 text-right" id="changeDisplay">0,00 €</div></div>
                     </div>
                 </div>
                 <button onclick="closeModal('paymentModal')" class="text-slate-500 font-bold mt-4">Abbrechen</button>
             </div>
             <div class="p-8 flex-grow">
-                <div class="grid grid-cols-4 gap-2 mb-4">
-                    <button onclick="setQuickCash(5)" class="bg-slate-700 py-3 rounded-lg font-bold text-amber-400">5€</button>
-                    <button onclick="setQuickCash(10)" class="bg-slate-700 py-3 rounded-lg font-bold text-amber-400">10€</button>
-                    <button onclick="setQuickCash(20)" class="bg-slate-700 py-3 rounded-lg font-bold text-amber-400">20€</button>
-                    <button onclick="setQuickCash(50)" class="bg-slate-700 py-3 rounded-lg font-bold text-amber-400">50€</button>
-                </div>
+                <div class="grid grid-cols-4 gap-2 mb-4"><button onclick="setQuickCash(5)" class="bg-slate-700 py-3 rounded-lg font-bold text-amber-400">5€</button><button onclick="setQuickCash(10)" class="bg-slate-700 py-3 rounded-lg font-bold text-amber-400">10€</button><button onclick="setQuickCash(20)" class="bg-slate-700 py-3 rounded-lg font-bold text-amber-400">20€</button><button onclick="setQuickCash(50)" class="bg-slate-700 py-3 rounded-lg font-bold text-amber-400">50€</button></div>
                 <div class="grid grid-cols-3 gap-2">
-                    <button onclick="addPayNum(7)" class="num-btn">7</button>
-                    <button onclick="addPayNum(8)" class="num-btn">8</button>
-                    <button onclick="addPayNum(9)" class="num-btn">9</button>
-                    <button onclick="addPayNum(4)" class="num-btn">4</button>
-                    <button onclick="addPayNum(5)" class="num-btn">5</button>
-                    <button onclick="addPayNum(6)" class="num-btn">6</button>
-                    <button onclick="addPayNum(1)" class="num-btn">1</button>
-                    <button onclick="addPayNum(2)" class="num-btn">2</button>
-                    <button onclick="addPayNum(3)" class="num-btn">3</button>
-                    <button onclick="clearPayNum()" class="num-btn text-rose-500"><i data-lucide="delete" class="mx-auto"></i></button>
-                    <button onclick="addPayNum(0)" class="num-btn">0</button>
-                    <button onclick="addPayNum('.')" class="num-btn">,</button>
+                    <button onclick="addPayNum(7)" class="num-btn">7</button><button onclick="addPayNum(8)" class="num-btn">8</button><button onclick="addPayNum(9)" class="num-btn">9</button>
+                    <button onclick="addPayNum(4)" class="num-btn">4</button><button onclick="addPayNum(5)" class="num-btn">5</button><button onclick="addPayNum(6)" class="num-btn">6</button>
+                    <button onclick="addPayNum(1)" class="num-btn">1</button><button onclick="addPayNum(2)" class="num-btn">2</button><button onclick="addPayNum(3)" class="num-btn">3</button>
+                    <button onclick="clearPayNum()" class="num-btn text-rose-500"><i data-lucide="delete" class="mx-auto"></i></button><button onclick="addPayNum(0)" class="num-btn">0</button><button onclick="addPayNum('.')" class="num-btn">,</button>
                 </div>
-                <button id="confirmBtn" onclick="processSale()" disabled class="w-full bg-indigo-600 py-4 mt-6 rounded-2xl text-2xl font-bold text-white shadow-xl shadow-indigo-900/40">Buchen</button>
+                <button id="confirmBtn" onclick="processSale()" disabled class="w-full bg-indigo-600 py-4 mt-6 rounded-2xl text-2xl font-bold text-white">Buchen</button>
             </div>
         </div>
     </div>
 
     <div id="confirmModal" class="fixed inset-0 bg-black/80 hidden z-[90] flex items-center justify-center p-6 transition-all opacity-0">
         <div class="bg-slate-800 p-8 rounded-3xl max-w-sm w-full border border-slate-700 shadow-2xl">
-            <h3 id="confTitle" class="text-xl font-bold text-white mb-2">Titel</h3>
-            <p id="confMsg" class="text-slate-400 mb-8">Nachricht</p>
-            <div class="flex gap-3">
-                <button onclick="closeModal('confirmModal')" class="flex-1 py-3 text-slate-500 font-bold">Nein</button>
-                <button id="confActionBtn" class="flex-1 bg-rose-600 py-3 rounded-xl text-white font-bold">Ja</button>
-            </div>
+            <h3 id="confTitle" class="text-xl font-bold text-white mb-2">Titel</h3><p id="confMsg" class="text-slate-400 mb-8">Nachricht</p>
+            <div class="flex gap-3"><button onclick="closeModal('confirmModal')" class="flex-1 py-3 text-slate-500 font-bold">Abbrechen</button><button id="confActionBtn" class="flex-1 bg-rose-600 py-3 rounded-xl text-white font-bold">Bestätigen</button></div>
         </div>
     </div>
 
@@ -374,14 +326,14 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, writeBatch, serverTimestamp, deleteDoc, increment, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'winter-kasse-pro';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'winter-kasse-v13';
         const firebaseConfig = {
-  apiKey: "AIzaSyCek4vZ4kfbz42u5jBym1DakFmdnmpV5nY",
-  authDomain: "winterball26.firebaseapp.com",
-  projectId: "winterball26",
-  storageBucket: "winterball26.firebasestorage.app",
-  messagingSenderId: "984174918294",
-  appId: "1:984174918294:web:e368ed69d9d712a63720b7"
+  apiKey: "AIzaSyDIHKr_s9517gqqY8_LhxXehxWO49RgjYM",
+  authDomain: "winterball-47c80.firebaseapp.com",
+  projectId: "winterball-47c80",
+  storageBucket: "winterball-47c80.firebasestorage.app",
+  messagingSenderId: "163769695678",
+  appId: "1:163769695678:web:e6efe50cbda33fa7edcdef"
 };
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
@@ -397,6 +349,15 @@
         let totalExpenses = 0;
         let selectedProductForVar = null;
         let currentView = 'order';
+        
+        // Multi-POS State
+        let currentPos = 1; 
+        let currentCustomerPos = 1;
+        let customerSyncUnsubscribe = null;
+
+        function getPosName(num) {
+            return num === 1 ? "GETRÄNKE" : "SPEISEN";
+        }
 
         async function init() {
             if (!firebaseConfig) return;
@@ -416,6 +377,45 @@
             });
         }
 
+        window.setPOS = (num) => {
+            currentPos = num;
+            const posName = getPosName(num);
+            document.getElementById('pos-btn-1').className = num === 1 ? "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white" : "px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-400";
+            document.getElementById('pos-btn-2').className = num === 2 ? "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white" : "px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-400";
+            document.getElementById('activePosIndicator').textContent = posName;
+            document.getElementById('screensaverSubtitle').textContent = posName;
+            
+            // Clear local cart when switching POS to avoid confusion
+            localCart = [];
+            updateCartUI();
+            
+            // Render grid to filter products for new POS
+            renderProductGrid();
+            
+            toast(`Auf ${posName} gewechselt`);
+        };
+
+        window.openCustomerView = (num) => {
+            currentCustomerPos = num;
+            const posName = getPosName(num);
+            document.getElementById('customerPosTag').textContent = posName;
+            document.getElementById('custSaverSubtitle').textContent = "KASSE " + posName;
+            
+            // Re-bind the listener to the specific POS cart
+            if(customerSyncUnsubscribe) customerSyncUnsubscribe();
+            
+            customerSyncUnsubscribe = onSnapshot(doc(db, PATH, 'sync', `cart_pos_${num}`), docSnap => {
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    renderCustomerCart(data.items || [], data.total || 0);
+                } else {
+                    renderCustomerCart([], 0);
+                }
+            }, (e) => console.error(e));
+
+            setView('customer');
+        };
+
         function startDataListeners() {
             onSnapshot(collection(db, PATH, 'inventory'), snap => {
                 inventory = {}; snap.forEach(d => inventory[d.id] = d.data());
@@ -434,15 +434,6 @@
                     renderDashboard();
                 }
             }, (e) => console.error(e));
-
-            onSnapshot(doc(db, PATH, 'sync', 'cart'), docSnap => {
-                if(docSnap.exists()) {
-                    const data = docSnap.data();
-                    renderCustomerCart(data.items || [], data.total || 0);
-                } else {
-                    renderCustomerCart([], 0);
-                }
-            }, (e) => console.error(e));
         }
 
         window.setView = (id) => {
@@ -455,20 +446,16 @@
                 b.classList.add('text-slate-400');
             });
             const activeBtn = document.getElementById('nav-' + id);
-            if(activeBtn) {
-                activeBtn.classList.replace('text-slate-400', 'text-white');
-                activeBtn.classList.add('bg-indigo-600');
-            }
-
+            if(activeBtn) { activeBtn.classList.replace('text-slate-400', 'text-white'); activeBtn.classList.add('bg-indigo-600'); }
+            
+            // Hide header if in customer view
             document.getElementById('mainHeader').classList.toggle('hidden', id === 'customer');
-            if (id === 'inventory') resetForm();
         };
 
         let localCart = [];
         window.addToCart = (name, price, isVariant, isLarge, parent) => {
             localCart.push({ name, price, isVariant, isLarge, parent: parent || name });
-            syncCartToFirebase();
-            updateCartUI();
+            syncCartToFirebase(); updateCartUI();
         };
 
         window.remFromCart = (idx) => { localCart.splice(idx,1); syncCartToFirebase(); updateCartUI(); };
@@ -476,12 +463,16 @@
 
         async function syncCartToFirebase() {
             const total = localCart.reduce((a,b) => a + b.price, 0);
-            await setDoc(doc(db, PATH, 'sync', 'cart'), { items: localCart, total: total, lastUpdate: serverTimestamp() });
+            // Sync to the specific POS document
+            await setDoc(doc(db, PATH, 'sync', `cart_pos_${currentPos}`), { 
+                items: localCart, 
+                total: total, 
+                lastUpdate: serverTimestamp() 
+            });
         }
 
         function updateCartUI() {
-            const list = document.getElementById('cartItemsList');
-            list.innerHTML = '';
+            const list = document.getElementById('cartItemsList'); list.innerHTML = '';
             payTotal = 0;
             localCart.forEach((item, idx) => {
                 payTotal += item.price;
@@ -499,10 +490,8 @@
             const saver = document.getElementById('customerScreensaver');
             const list = document.getElementById('customerCartItems');
             const totalDisplay = document.getElementById('customerTotal');
-
             if(items.length > 0) saver.classList.add('opacity-0', 'pointer-events-none');
             else saver.classList.remove('opacity-0', 'pointer-events-none');
-
             list.innerHTML = '';
             items.forEach(item => {
                 const div = document.createElement('div');
@@ -513,63 +502,44 @@
             totalDisplay.textContent = total.toFixed(2) + ' €';
         }
 
-        function renderCFD() {
-            const svg = document.getElementById('cfdChart');
-            if(!svg || orders.length === 0) return;
-            svg.innerHTML = '';
-            const width = svg.clientWidth;
-            const height = svg.clientHeight;
-            const sortedOrders = [...orders].sort((a,b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
-            const maxVal = sortedOrders.reduce((acc, curr) => acc + curr.total, 0);
-            let currentSum = 0;
-            const points = sortedOrders.map((o, i) => {
-                currentSum += o.total;
-                const x = sortedOrders.length > 1 ? (i / (sortedOrders.length - 1)) * width : width;
-                const y = height - (currentSum / (maxVal || 1)) * height;
-                return `${x},${y}`;
-            });
-            for(let i=0; i<=4; i++) {
-                const y = (i/4) * height;
-                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                line.setAttribute("x1", "0"); line.setAttribute("y1", y); line.setAttribute("x2", width); line.setAttribute("y2", y);
-                line.setAttribute("class", "cfd-grid");
-                svg.appendChild(line);
-            }
-            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            const d = points.length > 0 ? `M 0,${height} L ${points.join(' L ')} L ${width},${height} Z` : `M 0,${height} L ${width},${height} Z`;
-            path.setAttribute("d", d);
-            path.setAttribute("class", "cfd-area");
-            svg.appendChild(path);
-        }
-
         window.processSale = async () => {
             const batch = writeBatch(db);
             const orderRef = doc(collection(db, PATH, 'orders'));
-            batch.set(orderRef, { items: localCart, total: payTotal, timestamp: serverTimestamp() });
+            batch.set(orderRef, { 
+                items: localCart, 
+                total: payTotal, 
+                timestamp: serverTimestamp(),
+                pos: currentPos // Track which POS made the sale
+            });
             localCart.forEach(item => {
                 const invRef = doc(db, PATH, 'inventory', item.parent);
                 batch.update(invRef, item.isVariant ? (item.isLarge ? {stockL: increment(-1)} : {stockS: increment(-1)}) : {stock: increment(-1)});
             });
             await batch.commit();
-            localCart = [];
-            syncCartToFirebase();
-            updateCartUI();
-            closeModal('paymentModal');
-            toast("Verkauft!");
+            localCart = []; syncCartToFirebase(); updateCartUI();
+            closeModal('paymentModal'); toast("Erfolgreich gebucht!");
         };
 
         window.renderProductGrid = () => {
             const grid = document.getElementById('productGrid'); grid.innerHTML = '';
             Object.keys(inventory).sort().forEach(name => {
                 const item = inventory[name];
-                const card = document.createElement('div');
-                card.className = `product-card p-5 rounded-2xl flex flex-col justify-between h-44 cursor-pointer border border-slate-700/50`;
-                card.onclick = () => {
-                    if(item.hasVariants) { selectedProductForVar = name; openModal('sizeModal'); document.getElementById('priceSDisplay').textContent = item.priceS+'€'; document.getElementById('priceLDisplay').textContent = item.priceL+'€'; }
-                    else { addToCart(name, item.price, false, false); }
-                };
-                card.innerHTML = `<div class="font-extrabold text-white">${name}</div><div class="text-indigo-400 font-bold">${item.hasVariants ? item.priceS+'/'+item.priceL+'€' : item.price.toFixed(2)+'€'}</div><div class="text-[10px] text-slate-500">Bestand: ${item.hasVariants ? 'S:'+item.stockS+' L:'+item.stockL : item.stock}</div>`;
-                grid.appendChild(card);
+                
+                // --- FILTER LOGIC ---
+                // 0 = All (default if undefined), 1 = POS1, 2 = POS2
+                const itemPos = item.assignedPos !== undefined ? item.assignedPos : 0;
+                
+                // Show if assigned to ALL (0) OR matches current POS
+                if (itemPos === 0 || itemPos === currentPos) {
+                    const card = document.createElement('div');
+                    card.className = `product-card p-5 rounded-2xl flex flex-col justify-between h-44 cursor-pointer border border-slate-700/50`;
+                    card.onclick = () => {
+                        if(item.hasVariants) { selectedProductForVar = name; openModal('sizeModal'); document.getElementById('priceSDisplay').textContent = item.priceS+'€'; document.getElementById('priceLDisplay').textContent = item.priceL+'€'; }
+                        else { addToCart(name, item.price, false, false); }
+                    };
+                    card.innerHTML = `<div class="font-extrabold text-white">${name}</div><div class="text-indigo-400 font-bold">${item.hasVariants ? item.priceS+'/'+item.priceL+'€' : item.price.toFixed(2)+'€'}</div><div class="text-[10px] text-slate-500">Stock: ${item.hasVariants ? 'S:'+item.stockS+' L:'+item.stockL : item.stock}</div>`;
+                    grid.appendChild(card);
+                }
             });
         };
 
@@ -586,21 +556,81 @@
             document.getElementById('statRevenue').textContent = rev.toFixed(2) + ' €';
             document.getElementById('statProfit').textContent = (rev - totalExpenses).toFixed(2) + ' €';
             document.getElementById('statCount').textContent = orders.length;
-            document.getElementById('displayExpenses').textContent = totalExpenses.toFixed(2) + ' €';
-            document.getElementById('statAvg').textContent = orders.length > 0 ? (rev / orders.length).toFixed(2) + ' €' : '0,00 €';
-            renderCFD();
         };
 
         window.tryInventoryAccess = () => { currentPin = ""; updatePinDots(); openModal('pinModal'); };
         window.addPin = (n) => { if(currentPin.length < 4) { currentPin += n; updatePinDots(); if(currentPin === "5657") { closeModal('pinModal'); setView('inventory'); } } };
         function updatePinDots() { for(let i=1;i<=4;i++) document.getElementById('pinDot'+i).className = currentPin.length >= i ? "w-4 h-4 rounded-full bg-indigo-500" : "w-4 h-4 rounded-full border-2 border-slate-700"; }
         window.clearPin = () => { currentPin = ""; updatePinDots(); };
-        window.saveExpenses = async () => { const v = parseFloat(document.getElementById('expenseInput').value) || 0; await setDoc(doc(db, PATH, 'stats', 'finance'), {expenses: v}); toast("Gespeichert"); };
-        
+
+        window.renderHistory = () => {
+            const l = document.getElementById('historyList'); l.innerHTML = '';
+            const countDisplay = document.getElementById('historyCount');
+            countDisplay.textContent = `${orders.length} Buchungen`;
+            
+            orders.sort((a,b) => (b.timestamp?.seconds||0)-(a.timestamp?.seconds||0)).forEach(o => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-800/80 border border-slate-700 rounded-2xl overflow-hidden shadow-sm";
+                
+                let itemsHtml = (o.items || []).map(i => `
+                    <div class="flex justify-between text-sm py-1 border-b border-slate-700/30 last:border-0">
+                        <span class="text-slate-300">${i.name}</span>
+                        <span class="text-slate-500 font-mono">${i.price.toFixed(2)}€</span>
+                    </div>
+                `).join('');
+
+                const posName = getPosName(o.pos || 1);
+
+                div.innerHTML = `
+                    <div class="p-4 flex justify-between items-start bg-slate-800/40">
+                        <div>
+                            <p class="text-lg font-bold text-white">${o.total.toFixed(2)} €</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-[10px] text-indigo-400 font-black px-1.5 py-0.5 bg-indigo-500/10 rounded">${posName}</span>
+                                <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">${o.timestamp ? new Date(o.timestamp.seconds*1000).toLocaleString() : 'Pending...'}</span>
+                            </div>
+                        </div>
+                        <button onclick="showConfirm('Stornieren?', 'Die Summe wird abgezogen und der Bestand korrigiert.', () => deleteOrder('${o.id}'))" class="text-rose-500 hover:bg-rose-500/10 p-2 rounded-lg transition-colors">
+                            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="px-4 pb-4 pt-2">
+                        <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700/50">
+                            ${itemsHtml || '<p class="text-xs text-slate-600">Keine Details verfügbar</p>'}
+                        </div>
+                    </div>
+                `;
+                l.appendChild(div);
+            });
+            lucide.createIcons();
+        };
+
+        window.deleteOrder = async (orderId) => {
+            const order = orders.find(o => o.id === orderId);
+            if(!order) return;
+            
+            const batch = writeBatch(db);
+            (order.items || []).forEach(item => {
+                const invRef = doc(db, PATH, 'inventory', item.parent);
+                batch.update(invRef, item.isVariant ? (item.isLarge ? {stockL: increment(1)} : {stockS: increment(1)}) : {stock: increment(1)});
+            });
+            batch.delete(doc(db, PATH, 'orders', orderId));
+            await batch.commit();
+            toast("Storniert & Bestand korrigiert");
+        };
+
         window.saveProduct = async () => {
             const n = document.getElementById('invName').value;
             const isV = document.getElementById('invHasVar').checked;
-            const data = { hasVariants: isV };
+            
+            // Get selected POS from Radio Buttons
+            const posVal = document.querySelector('input[name="invPos"]:checked').value;
+            
+            const data = { 
+                hasVariants: isV,
+                assignedPos: parseInt(posVal) // 0, 1, or 2
+            };
+
             if(isV) { data.priceS = parseFloat(document.getElementById('invPriceS').value); data.stockS = parseInt(document.getElementById('invStockS').value); data.priceL = parseFloat(document.getElementById('invPriceL').value); data.stockL = parseInt(document.getElementById('invStockL').value); }
             else { data.price = parseFloat(document.getElementById('invPrice').value); data.stock = parseInt(document.getElementById('invStock').value); }
             await setDoc(doc(db, PATH, 'inventory', n), data); resetForm();
@@ -610,20 +640,19 @@
             const l = document.getElementById('inventoryList'); l.innerHTML = '';
             Object.keys(inventory).sort().forEach(n => {
                 const item = inventory[n];
-                const priceDisplay = item.hasVariants 
-                    ? `<span class="text-xs text-indigo-400">S: ${item.priceS}€ / L: ${item.priceL}€</span>`
-                    : `<span class="text-xs text-indigo-400">${item.price.toFixed(2)}€</span>`;
-                const d = document.createElement('div'); 
-                d.className = "p-3 bg-slate-800 rounded-lg flex justify-between items-center";
-                d.innerHTML = `
-                    <div class="flex flex-col">
-                        <span class="font-bold text-white">${n}</span>
-                        ${priceDisplay}
+                
+                // Determine Badge
+                const itemPos = item.assignedPos !== undefined ? item.assignedPos : 0;
+                let posBadge = '<span class="text-[10px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded ml-2 font-bold">ALLE</span>';
+                if(itemPos === 1) posBadge = '<span class="text-[10px] bg-indigo-900 text-indigo-300 px-1.5 py-0.5 rounded ml-2 font-bold border border-indigo-500/30">GETRÄNKE</span>';
+                if(itemPos === 2) posBadge = '<span class="text-[10px] bg-purple-900 text-purple-300 px-1.5 py-0.5 rounded ml-2 font-bold border border-purple-500/30">SPEISEN</span>';
+
+                const d = document.createElement('div'); d.className = "p-4 bg-slate-800 rounded-xl flex justify-between items-center";
+                d.innerHTML = `<div class="flex flex-col">
+                        <div class="flex items-center"><span class="font-bold text-white">${n}</span>${posBadge}</div>
+                        <span class="text-xs text-indigo-400 mt-0.5">${item.hasVariants ? 'Varianten aktiv' : item.price.toFixed(2)+'€'}</span>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="editProduct('${n}')" class="p-2 text-sky-400 hover:bg-sky-500/10 rounded"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                        <button onclick="deleteProduct('${n}')" class="p-2 text-rose-500 hover:bg-rose-500/10 rounded"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>`;
+                    <div class="flex gap-2"><button onclick="editProduct('${n}')" class="p-2 text-sky-400"><i data-lucide="pencil" class="w-4 h-4"></i></button><button onclick="deleteProduct('${n}')" class="p-2 text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
                 l.appendChild(d);
             });
             lucide.createIcons();
@@ -631,22 +660,19 @@
 
         window.editProduct = (n) => {
             const item = inventory[n];
-            if(!item) return;
             document.getElementById('invName').value = n;
             document.getElementById('invHasVar').checked = item.hasVariants;
+            
+            // Set Radio Button
+            const itemPos = item.assignedPos !== undefined ? item.assignedPos : 0;
+            const radio = document.querySelector(`input[name="invPos"][value="${itemPos}"]`);
+            if(radio) radio.checked = true;
+
             toggleInvInputs();
-            if(item.hasVariants) {
-                document.getElementById('invPriceS').value = item.priceS;
-                document.getElementById('invStockS').value = item.stockS;
-                document.getElementById('invPriceL').value = item.priceL;
-                document.getElementById('invStockL').value = item.stockL;
-            } else {
-                document.getElementById('invPrice').value = item.price;
-                document.getElementById('invStock').value = item.stock;
-            }
+            if(item.hasVariants) { document.getElementById('invPriceS').value = item.priceS; document.getElementById('invStockS').value = item.stockS; document.getElementById('invPriceL').value = item.priceL; document.getElementById('invStockL').value = item.stockL; }
+            else { document.getElementById('invPrice').value = item.price; document.getElementById('invStock').value = item.stock; }
             document.getElementById('inventoryView').scrollTo({ top: 0, behavior: 'smooth' });
             document.getElementById('cancelEditBtn').classList.remove('hidden');
-            document.getElementById('formTitle').textContent = "Artikel bearbeiten";
         };
 
         window.deleteProduct = async (n) => { await deleteDoc(doc(db, PATH, 'inventory', n)); };
@@ -654,62 +680,72 @@
         
         window.resetForm = () => { 
             document.getElementById('invName').value = ""; 
-            document.getElementById('invPrice').value = "";
-            document.getElementById('invStock').value = "";
-            document.getElementById('invPriceS').value = "";
-            document.getElementById('invStockS').value = "";
-            document.getElementById('invPriceL').value = "";
-            document.getElementById('invStockL').value = "";
-            document.getElementById('invHasVar').checked = false;
-            toggleInvInputs();
-            document.getElementById('cancelEditBtn').classList.add('hidden');
-            document.getElementById('formTitle').textContent = "Neuer Artikel";
-        };
+            document.getElementById('invPrice').value = ""; 
+            document.getElementById('invStock').value = ""; 
+            document.getElementById('invPriceS').value = ""; 
+            document.getElementById('invStockS').value = ""; 
+            document.getElementById('invPriceL').value = ""; 
+            document.getElementById('invStockL').value = ""; 
+            document.getElementById('invHasVar').checked = false; 
+            
+            // Reset Radio to All
+            document.querySelector(`input[name="invPos"][value="0"]`).checked = true;
 
+            toggleInvInputs(); 
+            document.getElementById('cancelEditBtn').classList.add('hidden'); 
+        };
+        
+        window.saveExpenses = async () => { await setDoc(doc(db, PATH, 'stats', 'finance'), {expenses: parseFloat(document.getElementById('expenseInput').value) || 0}); toast("Ausgaben aktualisiert"); };
+        
         window.openModal = (id) => { const m = document.getElementById(id); m.classList.remove('hidden'); setTimeout(() => m.classList.remove('opacity-0'), 10); };
         window.closeModal = (id) => { const m = document.getElementById(id); m.classList.add('opacity-0'); setTimeout(() => m.classList.add('hidden'), 200); };
         window.toast = (m) => { const t = document.getElementById('toast'); document.getElementById('toastMsg').textContent = m; t.classList.remove('translate-x-[150%]'); setTimeout(() => t.classList.add('translate-x-[150%]'), 3000); };
-        window.showPaymentModal = () => { payInput = ""; updatePayUI(); openModal('paymentModal'); };
+        window.showPaymentModal = () => { payInput = ""; updatePayUI(); document.getElementById('payTotalDisplay').textContent = payTotal.toFixed(2) + ' €'; openModal('paymentModal'); };
         window.addPayNum = (n) => { payInput += n; updatePayUI(); };
         window.clearPayNum = () => { payInput = ""; updatePayUI(); };
         window.setQuickCash = (v) => { payInput = v.toString(); updatePayUI(); };
         function updatePayUI() { 
             const g = parseFloat(payInput) || 0; const diff = g - payTotal;
             document.getElementById('payInputDisplay').textContent = (payInput || '0') + ' €';
-            document.getElementById('changeDisplay').textContent = diff >= 0 ? diff.toFixed(2) + ' €' : 'Fehlt';
+            document.getElementById('changeDisplay').textContent = diff >= 0 ? diff.toFixed(2) + ' €' : '---';
             document.getElementById('confirmBtn').disabled = g < payTotal;
         }
-
         window.showConfirm = (title, msg, action) => {
-            document.getElementById('confTitle').textContent = title;
-            document.getElementById('confMsg').textContent = msg;
-            const btn = document.getElementById('confActionBtn');
-            btn.onclick = () => { action(); closeModal('confirmModal'); };
+            document.getElementById('confTitle').textContent = title; document.getElementById('confMsg').textContent = msg;
+            const btn = document.getElementById('confActionBtn'); btn.onclick = () => { action(); closeModal('confirmModal'); };
             openModal('confirmModal');
         };
 
         function startScreensaverTimer() {
             const saver = document.getElementById('screensaver');
-            const reset = () => { idleTimer = 0; if(!saver.classList.contains('hidden')) { saver.classList.add('opacity-0'); setTimeout(() => saver.classList.add('hidden'), 500); } };
-            ['click', 'mousemove', 'touchstart'].forEach(e => window.addEventListener(e, reset));
-            setInterval(() => { idleTimer++; if(idleTimer >= 30 && currentView !== 'customer') { saver.classList.remove('hidden'); setTimeout(() => saver.classList.remove('opacity-0'), 10); } }, 1000);
+            const reset = () => { 
+                idleTimer = 0; 
+                if(!saver.classList.contains('hidden')) { 
+                    saver.classList.add('opacity-0'); 
+                    setTimeout(() => saver.classList.add('hidden'), 500); 
+                } 
+            };
+            ['click', 'mousemove', 'touchstart', 'keydown'].forEach(e => window.addEventListener(e, reset));
+            
+            setInterval(() => { 
+                idleTimer++; 
+                if(idleTimer >= 10 && currentView !== 'customer' && currentView !== 'customer-select') { 
+                    if(saver.classList.contains('hidden')) {
+                        saver.classList.remove('hidden'); 
+                        setTimeout(() => saver.classList.remove('opacity-0'), 10); 
+                    }
+                } 
+            }, 1000);
         }
-
-        window.renderHistory = () => {
-            const l = document.getElementById('historyList'); l.innerHTML = '';
-            orders.sort((a,b) => (b.timestamp?.seconds||0)-(a.timestamp?.seconds||0)).forEach(o => {
-                const d = document.createElement('div'); d.className = "p-4 bg-slate-800 rounded-xl mb-2";
-                d.innerHTML = `<div class="flex justify-between font-bold"><span>${o.total.toFixed(2)}€</span><span class="text-xs text-slate-500">${o.timestamp ? new Date(o.timestamp.seconds*1000).toLocaleTimeString() : ''}</span></div>`;
-                l.appendChild(d);
-            });
-        };
 
         window.resetApp = async () => { 
             const batch = writeBatch(db);
             orders.forEach(o => batch.delete(doc(db, PATH, 'orders', o.id)));
             batch.set(doc(db, PATH, 'stats', 'finance'), {expenses: 0});
-            await batch.commit();
-            toast("System zurückgesetzt");
+            // Clear sync docs
+            batch.delete(doc(db, PATH, 'sync', 'cart_pos_1'));
+            batch.delete(doc(db, PATH, 'sync', 'cart_pos_2'));
+            await batch.commit(); toast("Alles zurückgesetzt");
         };
 
         init();
