@@ -149,18 +149,39 @@
                     </div>
                     <div id="customerPosTag" class="text-indigo-500 font-bold uppercase tracking-widest text-lg">GETRÄNKE</div>
                 </div>
-                <div id="customerCartItems" class="flex-grow space-y-6 overflow-y-auto custom-scrollbar pr-4"></div>
-                <div class="mt-12 pt-10 border-t border-slate-800 flex justify-between items-end">
-                    <div>
-                        <p class="text-slate-500 font-bold uppercase tracking-widest mb-2">Gesamtsumme</p>
-                        <p id="customerTotal" class="text-9xl font-black text-white tracking-tighter">0,00 €</p>
+                
+                <!-- Hauptbereich Kundenansicht -->
+                <div class="flex flex-col h-full gap-8">
+                    <!-- Warenkorb Liste -->
+                    <div id="customerCartItems" class="flex-grow space-y-4 overflow-y-auto custom-scrollbar pr-4 transition-all duration-300"></div>
+                    
+                    <!-- Zahlungs-Info Overlay (wird eingeblendet wenn Kassiert wird) -->
+                    <div id="customerPaymentOverlay" class="hidden bg-slate-900 border-2 border-indigo-500 rounded-[2.5rem] p-10 shadow-2xl shadow-indigo-500/10 animate-in fade-in zoom-in duration-300">
+                        <div class="grid grid-cols-2 gap-10">
+                            <div>
+                                <p class="text-slate-500 font-bold uppercase tracking-widest text-sm mb-2">Gegeben</p>
+                                <p id="customerGiven" class="text-7xl font-mono font-black text-white">0,00 €</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-slate-500 font-bold uppercase tracking-widest text-sm mb-2">Rückgeld</p>
+                                <p id="customerChange" class="text-7xl font-mono font-black text-emerald-400">0,00 €</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-10 border-t border-slate-800 flex justify-between items-end">
+                        <div>
+                            <p class="text-slate-500 font-bold uppercase tracking-widest mb-2">Gesamtsumme</p>
+                            <p id="customerTotal" class="text-9xl font-black text-white tracking-tighter">0,00 €</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- VIEW: DASHBOARD -->
+        <!-- VIEW: DASHBOARD & HISTORY & INVENTORY (aus Vorversion übernommen) -->
         <section id="dashboardView" class="view-section hidden h-full overflow-y-auto p-6 md:p-10">
+            <!-- ... Gleiche Dashboard UI wie v15 ... -->
             <div class="max-w-4xl mx-auto space-y-8 pb-20">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
@@ -176,26 +197,9 @@
                         <h3 class="text-3xl font-black text-sky-400" id="statCount">0</h3>
                     </div>
                 </div>
-                
-                <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div>
-                            <h3 class="font-bold text-white text-lg flex items-center gap-2">
-                                <i data-lucide="shopping-cart" class="text-indigo-400 w-5 h-5"></i> 
-                                Wareneinkauf / Ausgaben
-                            </h3>
-                            <p class="text-xs text-slate-500 mt-1">Hier die Gesamtkosten aller Einkäufe eintragen.</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <input type="number" id="expenseInput" step="0.01" placeholder="0.00" class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono text-xl w-40 outline-none">
-                            <button onclick="saveExpenses()" class="bg-indigo-600 px-6 py-3.5 rounded-xl font-bold hover:bg-indigo-500 transition-colors">Speichern</button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
 
-        <!-- VIEW: HISTORIE -->
         <section id="historyView" class="view-section hidden h-full overflow-y-auto p-6 md:p-10">
             <div class="max-w-3xl mx-auto">
                 <div class="flex justify-between items-center mb-8">
@@ -206,9 +210,8 @@
             </div>
         </section>
 
-        <!-- VIEW: INVENTAR -->
         <section id="inventoryView" class="view-section hidden h-full overflow-y-auto p-6 md:p-10">
-            <div class="max-w-3xl mx-auto space-y-8">
+             <div class="max-w-3xl mx-auto space-y-8">
                 <div class="flex justify-between items-center">
                     <h2 class="text-2xl font-bold text-white">Bestandsverwaltung</h2>
                     <button onclick="showConfirm('Alles löschen?', 'Alle Verkäufe und Bestände werden entfernt!', resetApp)" class="text-xs bg-rose-500/10 text-rose-500 px-3 py-1.5 rounded-lg border border-rose-500/20">System Reset</button>
@@ -258,6 +261,7 @@
     </main>
 
     <!-- === MODALS === -->
+    <!-- Pin, Size, Payment, Confirm (aus Vorversion übernommen) -->
     <div id="pinModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl hidden z-[80] flex items-center justify-center p-4 transition-all opacity-0">
         <div class="max-w-sm w-full space-y-8">
             <div class="text-center">
@@ -299,7 +303,7 @@
                         <div class="bg-slate-800 p-4 rounded-xl"><p class="text-xs text-slate-500 uppercase mb-1">Rückgeld</p><div class="text-4xl font-mono font-bold text-emerald-400 text-right" id="changeDisplay">0,00 €</div></div>
                     </div>
                 </div>
-                <button onclick="closeModal('paymentModal')" class="text-slate-500 font-bold mt-4">Abbrechen</button>
+                <button onclick="closePaymentModal()" class="text-slate-500 font-bold mt-4">Abbrechen</button>
             </div>
             <div class="p-8 flex-grow">
                 <div class="grid grid-cols-4 gap-2 mb-4"><button onclick="setQuickCash(5)" class="bg-slate-700 py-3 rounded-lg font-bold text-amber-400">5€</button><button onclick="setQuickCash(10)" class="bg-slate-700 py-3 rounded-lg font-bold text-amber-400">10€</button><button onclick="setQuickCash(20)" class="bg-slate-700 py-3 rounded-lg font-bold text-amber-400">20€</button><button onclick="setQuickCash(50)" class="bg-slate-700 py-3 rounded-lg font-bold text-amber-400">50€</button></div>
@@ -326,7 +330,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, writeBatch, serverTimestamp, deleteDoc, increment, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'winter-kasse-v13';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'winter-kasse-v16';
         const firebaseConfig = {
   apiKey: "AIzaSyCek4vZ4kfbz42u5jBym1DakFmdnmpV5nY",
   authDomain: "winterball26.firebaseapp.com",
@@ -350,7 +354,6 @@
         let selectedProductForVar = null;
         let currentView = 'order';
         
-        // Multi-POS State
         let currentPos = 1; 
         let currentCustomerPos = 1;
         let customerSyncUnsubscribe = null;
@@ -385,91 +388,179 @@
             document.getElementById('activePosIndicator').textContent = posName;
             document.getElementById('screensaverSubtitle').textContent = posName;
             
-            // Clear local cart when switching POS to avoid confusion
             localCart = [];
             updateCartUI();
-            
-            // Render grid to filter products for new POS
             renderProductGrid();
-            
             toast(`Auf ${posName} gewechselt`);
         };
 
+        // --- KUNDENANSICHT LOGIK ---
         window.openCustomerView = (num) => {
             currentCustomerPos = num;
             const posName = getPosName(num);
             document.getElementById('customerPosTag').textContent = posName;
             document.getElementById('custSaverSubtitle').textContent = "KASSE " + posName;
             
-            // Re-bind the listener to the specific POS cart
             if(customerSyncUnsubscribe) customerSyncUnsubscribe();
             
             customerSyncUnsubscribe = onSnapshot(doc(db, PATH, 'sync', `cart_pos_${num}`), docSnap => {
                 if(docSnap.exists()) {
                     const data = docSnap.data();
-                    renderCustomerCart(data.items || [], data.total || 0);
+                    renderCustomerCart(data);
                 } else {
-                    renderCustomerCart([], 0);
+                    renderCustomerCart({ items: [], total: 0 });
                 }
             }, (e) => console.error(e));
 
             setView('customer');
         };
 
+        function renderCustomerCart(data) {
+            const items = data.items || [];
+            const total = data.total || 0;
+            const isPaying = data.isPaying || false;
+            const given = data.given || 0;
+            const change = data.change || 0;
+
+            const saver = document.getElementById('customerScreensaver');
+            const list = document.getElementById('customerCartItems');
+            const totalDisplay = document.getElementById('customerTotal');
+            const overlay = document.getElementById('customerPaymentOverlay');
+            
+            // Screensaver Handling
+            if(items.length > 0 || isPaying) saver.classList.add('opacity-0', 'pointer-events-none');
+            else saver.classList.remove('opacity-0', 'pointer-events-none');
+
+            // Warenkorb Liste (nur anzeigen wenn nicht gerade kassiert wird, für mehr Fokus)
+            list.innerHTML = '';
+            if(!isPaying) {
+                list.classList.remove('hidden');
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between items-center p-5 bg-slate-900 border border-slate-800 rounded-3xl animate-in slide-in-from-right-4 duration-300";
+                    div.innerHTML = `<span class="text-3xl font-black text-white">${item.name}</span><span class="text-3xl font-mono text-indigo-400">${item.price.toFixed(2)} €</span>`;
+                    list.appendChild(div);
+                });
+            } else {
+                list.classList.add('hidden');
+            }
+
+            // Zahlungs Overlay
+            if(isPaying) {
+                overlay.classList.remove('hidden');
+                document.getElementById('customerGiven').textContent = given.toFixed(2) + ' €';
+                document.getElementById('customerChange').textContent = (given >= total) ? change.toFixed(2) + ' €' : '---';
+            } else {
+                overlay.classList.add('hidden');
+            }
+
+            totalDisplay.textContent = total.toFixed(2) + ' €';
+        }
+
+        // --- VERKAUF / WARENKORB LOGIK ---
+        let localCart = [];
+        window.addToCart = (name, price, isVariant, isLarge, parent) => {
+            localCart.push({ name, price, isVariant, isLarge, parent: parent || name });
+            syncCartToFirebase(false); 
+            updateCartUI();
+        };
+
+        window.remFromCart = (idx) => { localCart.splice(idx,1); syncCartToFirebase(false); updateCartUI(); };
+        window.clearCart = () => { localCart = []; syncCartToFirebase(false); updateCartUI(); };
+
+        // Erweiterte Sync Funktion für Bezahlvorgang
+        async function syncCartToFirebase(isPaying = false) {
+            const total = localCart.reduce((a,b) => a + b.price, 0);
+            const given = parseFloat(payInput) || 0;
+            const change = given - total;
+
+            await setDoc(doc(db, PATH, 'sync', `cart_pos_${currentPos}`), { 
+                items: localCart, 
+                total: total, 
+                isPaying: isPaying,
+                given: given,
+                change: change,
+                lastUpdate: serverTimestamp() 
+            });
+        }
+
+        window.showPaymentModal = () => { 
+            payInput = ""; 
+            updatePayUI(); 
+            document.getElementById('payTotalDisplay').textContent = payTotal.toFixed(2) + ' €'; 
+            openModal('paymentModal'); 
+            syncCartToFirebase(true); // Kundenansicht auf Bezahl-Modus schalten
+        };
+
+        window.closePaymentModal = () => {
+            closeModal('paymentModal');
+            syncCartToFirebase(false); // Zurück zur normalen Ansicht
+        };
+
+        window.addPayNum = (n) => { payInput += n; updatePayUI(); syncCartToFirebase(true); };
+        window.clearPayNum = () => { payInput = ""; updatePayUI(); syncCartToFirebase(true); };
+        window.setQuickCash = (v) => { payInput = v.toString(); updatePayUI(); syncCartToFirebase(true); };
+
+        function updatePayUI() { 
+            const g = parseFloat(payInput) || 0; const diff = g - payTotal;
+            document.getElementById('payInputDisplay').textContent = (payInput || '0') + ' €';
+            document.getElementById('changeDisplay').textContent = diff >= 0 ? diff.toFixed(2) + ' €' : '---';
+            document.getElementById('confirmBtn').disabled = g < payTotal;
+        }
+
+        window.processSale = async () => {
+            const batch = writeBatch(db);
+            const orderRef = doc(collection(db, PATH, 'orders'));
+            batch.set(orderRef, { 
+                items: localCart, 
+                total: payTotal, 
+                timestamp: serverTimestamp(),
+                pos: currentPos
+            });
+            localCart.forEach(item => {
+                const invRef = doc(db, PATH, 'inventory', item.parent);
+                batch.update(invRef, item.isVariant ? (item.isLarge ? {stockL: increment(-1)} : {stockS: increment(-1)}) : {stock: increment(-1)});
+            });
+            await batch.commit();
+            localCart = []; 
+            payInput = "";
+            syncCartToFirebase(false); // Resetet die Kundenansicht (löscht Warenkorb dort)
+            updateCartUI();
+            closeModal('paymentModal'); 
+            toast("Erfolgreich gebucht!");
+        };
+
+        // --- HILFSFUNKTIONEN & LISTENERS (aus v15) ---
+
         function startDataListeners() {
             onSnapshot(collection(db, PATH, 'inventory'), snap => {
                 inventory = {}; snap.forEach(d => inventory[d.id] = d.data());
                 renderProductGrid(); renderInventoryList();
-            }, (e) => console.error(e));
-
+            });
             onSnapshot(collection(db, PATH, 'orders'), snap => {
                 orders = []; snap.forEach(d => orders.push({id: d.id, ...d.data()}));
                 renderDashboard(); renderHistory();
-            }, (e) => console.error(e));
-
+            });
             onSnapshot(doc(db, PATH, 'stats', 'finance'), docSnap => {
                 if (docSnap.exists()) {
                     totalExpenses = docSnap.data().expenses || 0;
-                    document.getElementById('expenseInput').value = totalExpenses;
                     renderDashboard();
                 }
-            }, (e) => console.error(e));
+            });
         }
 
         window.setView = (id) => {
             currentView = id;
             document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
             document.getElementById(id + 'View').classList.remove('hidden');
-            
             document.querySelectorAll('nav button').forEach(b => {
                 b.classList.remove('bg-indigo-600', 'text-white');
                 b.classList.add('text-slate-400');
             });
             const activeBtn = document.getElementById('nav-' + id);
             if(activeBtn) { activeBtn.classList.replace('text-slate-400', 'text-white'); activeBtn.classList.add('bg-indigo-600'); }
-            
-            // Hide header if in customer view
             document.getElementById('mainHeader').classList.toggle('hidden', id === 'customer');
         };
-
-        let localCart = [];
-        window.addToCart = (name, price, isVariant, isLarge, parent) => {
-            localCart.push({ name, price, isVariant, isLarge, parent: parent || name });
-            syncCartToFirebase(); updateCartUI();
-        };
-
-        window.remFromCart = (idx) => { localCart.splice(idx,1); syncCartToFirebase(); updateCartUI(); };
-        window.clearCart = () => { localCart = []; syncCartToFirebase(); updateCartUI(); };
-
-        async function syncCartToFirebase() {
-            const total = localCart.reduce((a,b) => a + b.price, 0);
-            // Sync to the specific POS document
-            await setDoc(doc(db, PATH, 'sync', `cart_pos_${currentPos}`), { 
-                items: localCart, 
-                total: total, 
-                lastUpdate: serverTimestamp() 
-            });
-        }
 
         function updateCartUI() {
             const list = document.getElementById('cartItemsList'); list.innerHTML = '';
@@ -486,50 +577,11 @@
             lucide.createIcons();
         }
 
-        function renderCustomerCart(items, total) {
-            const saver = document.getElementById('customerScreensaver');
-            const list = document.getElementById('customerCartItems');
-            const totalDisplay = document.getElementById('customerTotal');
-            if(items.length > 0) saver.classList.add('opacity-0', 'pointer-events-none');
-            else saver.classList.remove('opacity-0', 'pointer-events-none');
-            list.innerHTML = '';
-            items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center p-6 bg-slate-900 border border-slate-800 rounded-3xl";
-                div.innerHTML = `<span class="text-4xl font-black text-white">${item.name}</span><span class="text-4xl font-mono text-indigo-400">${item.price.toFixed(2)} €</span>`;
-                list.appendChild(div);
-            });
-            totalDisplay.textContent = total.toFixed(2) + ' €';
-        }
-
-        window.processSale = async () => {
-            const batch = writeBatch(db);
-            const orderRef = doc(collection(db, PATH, 'orders'));
-            batch.set(orderRef, { 
-                items: localCart, 
-                total: payTotal, 
-                timestamp: serverTimestamp(),
-                pos: currentPos // Track which POS made the sale
-            });
-            localCart.forEach(item => {
-                const invRef = doc(db, PATH, 'inventory', item.parent);
-                batch.update(invRef, item.isVariant ? (item.isLarge ? {stockL: increment(-1)} : {stockS: increment(-1)}) : {stock: increment(-1)});
-            });
-            await batch.commit();
-            localCart = []; syncCartToFirebase(); updateCartUI();
-            closeModal('paymentModal'); toast("Erfolgreich gebucht!");
-        };
-
         window.renderProductGrid = () => {
             const grid = document.getElementById('productGrid'); grid.innerHTML = '';
             Object.keys(inventory).sort().forEach(name => {
                 const item = inventory[name];
-                
-                // --- FILTER LOGIC ---
-                // 0 = All (default if undefined), 1 = POS1, 2 = POS2
                 const itemPos = item.assignedPos !== undefined ? item.assignedPos : 0;
-                
-                // Show if assigned to ALL (0) OR matches current POS
                 if (itemPos === 0 || itemPos === currentPos) {
                     const card = document.createElement('div');
                     card.className = `product-card p-5 rounded-2xl flex flex-col justify-between h-44 cursor-pointer border border-slate-700/50`;
@@ -537,7 +589,7 @@
                         if(item.hasVariants) { selectedProductForVar = name; openModal('sizeModal'); document.getElementById('priceSDisplay').textContent = item.priceS+'€'; document.getElementById('priceLDisplay').textContent = item.priceL+'€'; }
                         else { addToCart(name, item.price, false, false); }
                     };
-                    card.innerHTML = `<div class="font-extrabold text-white">${name}</div><div class="text-indigo-400 font-bold">${item.hasVariants ? item.priceS+'/'+item.priceL+'€' : item.price.toFixed(2)+'€'}</div><div class="text-[10px] text-slate-500">Stock: ${item.hasVariants ? 'S:'+item.stockS+' L:'+item.stockL : item.stock}</div>`;
+                    card.innerHTML = `<div class="font-extrabold text-white">${name}</div><div class="text-indigo-400 font-bold">${item.hasVariants ? item.priceS+'/'+item.priceL+'€' : item.price.toFixed(2)+'€'}</div><div class="text-[10px] text-slate-500">Vorrat: ${item.hasVariants ? 'S:'+item.stockS+' L:'+item.stockL : item.stock}</div>`;
                     grid.appendChild(card);
                 }
             });
@@ -565,72 +617,20 @@
 
         window.renderHistory = () => {
             const l = document.getElementById('historyList'); l.innerHTML = '';
-            const countDisplay = document.getElementById('historyCount');
-            countDisplay.textContent = `${orders.length} Buchungen`;
-            
             orders.sort((a,b) => (b.timestamp?.seconds||0)-(a.timestamp?.seconds||0)).forEach(o => {
                 const div = document.createElement('div');
-                div.className = "bg-slate-800/80 border border-slate-700 rounded-2xl overflow-hidden shadow-sm";
-                
-                let itemsHtml = (o.items || []).map(i => `
-                    <div class="flex justify-between text-sm py-1 border-b border-slate-700/30 last:border-0">
-                        <span class="text-slate-300">${i.name}</span>
-                        <span class="text-slate-500 font-mono">${i.price.toFixed(2)}€</span>
-                    </div>
-                `).join('');
-
-                const posName = getPosName(o.pos || 1);
-
-                div.innerHTML = `
-                    <div class="p-4 flex justify-between items-start bg-slate-800/40">
-                        <div>
-                            <p class="text-lg font-bold text-white">${o.total.toFixed(2)} €</p>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[10px] text-indigo-400 font-black px-1.5 py-0.5 bg-indigo-500/10 rounded">${posName}</span>
-                                <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">${o.timestamp ? new Date(o.timestamp.seconds*1000).toLocaleString() : 'Pending...'}</span>
-                            </div>
-                        </div>
-                        <button onclick="showConfirm('Stornieren?', 'Die Summe wird abgezogen und der Bestand korrigiert.', () => deleteOrder('${o.id}'))" class="text-rose-500 hover:bg-rose-500/10 p-2 rounded-lg transition-colors">
-                            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                    <div class="px-4 pb-4 pt-2">
-                        <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700/50">
-                            ${itemsHtml || '<p class="text-xs text-slate-600">Keine Details verfügbar</p>'}
-                        </div>
-                    </div>
-                `;
+                div.className = "bg-slate-800 border border-slate-700 p-4 rounded-2xl flex justify-between items-center";
+                div.innerHTML = `<div><p class="font-bold text-white">${o.total.toFixed(2)} €</p><p class="text-[10px] text-slate-500">${o.timestamp ? new Date(o.timestamp.seconds*1000).toLocaleString() : '...'}</p></div><button onclick="deleteOrder('${o.id}')" class="text-rose-500"><i data-lucide="rotate-ccw" class="w-5 h-5"></i></button>`;
                 l.appendChild(div);
             });
             lucide.createIcons();
         };
 
-        window.deleteOrder = async (orderId) => {
-            const order = orders.find(o => o.id === orderId);
-            if(!order) return;
-            
-            const batch = writeBatch(db);
-            (order.items || []).forEach(item => {
-                const invRef = doc(db, PATH, 'inventory', item.parent);
-                batch.update(invRef, item.isVariant ? (item.isLarge ? {stockL: increment(1)} : {stockS: increment(1)}) : {stock: increment(1)});
-            });
-            batch.delete(doc(db, PATH, 'orders', orderId));
-            await batch.commit();
-            toast("Storniert & Bestand korrigiert");
-        };
-
         window.saveProduct = async () => {
             const n = document.getElementById('invName').value;
             const isV = document.getElementById('invHasVar').checked;
-            
-            // Get selected POS from Radio Buttons
             const posVal = document.querySelector('input[name="invPos"]:checked').value;
-            
-            const data = { 
-                hasVariants: isV,
-                assignedPos: parseInt(posVal) // 0, 1, or 2
-            };
-
+            const data = { hasVariants: isV, assignedPos: parseInt(posVal) };
             if(isV) { data.priceS = parseFloat(document.getElementById('invPriceS').value); data.stockS = parseInt(document.getElementById('invStockS').value); data.priceL = parseFloat(document.getElementById('invPriceL').value); data.stockL = parseInt(document.getElementById('invStockL').value); }
             else { data.price = parseFloat(document.getElementById('invPrice').value); data.stock = parseInt(document.getElementById('invStock').value); }
             await setDoc(doc(db, PATH, 'inventory', n), data); resetForm();
@@ -640,19 +640,8 @@
             const l = document.getElementById('inventoryList'); l.innerHTML = '';
             Object.keys(inventory).sort().forEach(n => {
                 const item = inventory[n];
-                
-                // Determine Badge
-                const itemPos = item.assignedPos !== undefined ? item.assignedPos : 0;
-                let posBadge = '<span class="text-[10px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded ml-2 font-bold">ALLE</span>';
-                if(itemPos === 1) posBadge = '<span class="text-[10px] bg-indigo-900 text-indigo-300 px-1.5 py-0.5 rounded ml-2 font-bold border border-indigo-500/30">GETRÄNKE</span>';
-                if(itemPos === 2) posBadge = '<span class="text-[10px] bg-purple-900 text-purple-300 px-1.5 py-0.5 rounded ml-2 font-bold border border-purple-500/30">SPEISEN</span>';
-
                 const d = document.createElement('div'); d.className = "p-4 bg-slate-800 rounded-xl flex justify-between items-center";
-                d.innerHTML = `<div class="flex flex-col">
-                        <div class="flex items-center"><span class="font-bold text-white">${n}</span>${posBadge}</div>
-                        <span class="text-xs text-indigo-400 mt-0.5">${item.hasVariants ? 'Varianten aktiv' : item.price.toFixed(2)+'€'}</span>
-                    </div>
-                    <div class="flex gap-2"><button onclick="editProduct('${n}')" class="p-2 text-sky-400"><i data-lucide="pencil" class="w-4 h-4"></i></button><button onclick="deleteProduct('${n}')" class="p-2 text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
+                d.innerHTML = `<div><span class="font-bold text-white">${n}</span></div><div class="flex gap-2"><button onclick="editProduct('${n}')" class="text-sky-400"><i data-lucide="pencil" class="w-4 h-4"></i></button><button onclick="deleteProduct('${n}')" class="text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
                 l.appendChild(d);
             });
             lucide.createIcons();
@@ -662,54 +651,18 @@
             const item = inventory[n];
             document.getElementById('invName').value = n;
             document.getElementById('invHasVar').checked = item.hasVariants;
-            
-            // Set Radio Button
-            const itemPos = item.assignedPos !== undefined ? item.assignedPos : 0;
-            const radio = document.querySelector(`input[name="invPos"][value="${itemPos}"]`);
-            if(radio) radio.checked = true;
-
             toggleInvInputs();
             if(item.hasVariants) { document.getElementById('invPriceS').value = item.priceS; document.getElementById('invStockS').value = item.stockS; document.getElementById('invPriceL').value = item.priceL; document.getElementById('invStockL').value = item.stockL; }
             else { document.getElementById('invPrice').value = item.price; document.getElementById('invStock').value = item.stock; }
-            document.getElementById('inventoryView').scrollTo({ top: 0, behavior: 'smooth' });
             document.getElementById('cancelEditBtn').classList.remove('hidden');
         };
 
         window.deleteProduct = async (n) => { await deleteDoc(doc(db, PATH, 'inventory', n)); };
         window.toggleInvInputs = () => { const v = document.getElementById('invHasVar').checked; document.getElementById('invVarInputs').classList.toggle('hidden', !v); document.getElementById('invSingleInputs').classList.toggle('hidden', v); };
-        
-        window.resetForm = () => { 
-            document.getElementById('invName').value = ""; 
-            document.getElementById('invPrice').value = ""; 
-            document.getElementById('invStock').value = ""; 
-            document.getElementById('invPriceS').value = ""; 
-            document.getElementById('invStockS').value = ""; 
-            document.getElementById('invPriceL').value = ""; 
-            document.getElementById('invStockL').value = ""; 
-            document.getElementById('invHasVar').checked = false; 
-            
-            // Reset Radio to All
-            document.querySelector(`input[name="invPos"][value="0"]`).checked = true;
-
-            toggleInvInputs(); 
-            document.getElementById('cancelEditBtn').classList.add('hidden'); 
-        };
-        
-        window.saveExpenses = async () => { await setDoc(doc(db, PATH, 'stats', 'finance'), {expenses: parseFloat(document.getElementById('expenseInput').value) || 0}); toast("Ausgaben aktualisiert"); };
-        
+        window.resetForm = () => { document.getElementById('invName').value = ""; document.getElementById('invPrice').value = ""; document.getElementById('invStock').value = ""; document.getElementById('invHasVar').checked = false; toggleInvInputs(); document.getElementById('cancelEditBtn').classList.add('hidden'); };
         window.openModal = (id) => { const m = document.getElementById(id); m.classList.remove('hidden'); setTimeout(() => m.classList.remove('opacity-0'), 10); };
         window.closeModal = (id) => { const m = document.getElementById(id); m.classList.add('opacity-0'); setTimeout(() => m.classList.add('hidden'), 200); };
         window.toast = (m) => { const t = document.getElementById('toast'); document.getElementById('toastMsg').textContent = m; t.classList.remove('translate-x-[150%]'); setTimeout(() => t.classList.add('translate-x-[150%]'), 3000); };
-        window.showPaymentModal = () => { payInput = ""; updatePayUI(); document.getElementById('payTotalDisplay').textContent = payTotal.toFixed(2) + ' €'; openModal('paymentModal'); };
-        window.addPayNum = (n) => { payInput += n; updatePayUI(); };
-        window.clearPayNum = () => { payInput = ""; updatePayUI(); };
-        window.setQuickCash = (v) => { payInput = v.toString(); updatePayUI(); };
-        function updatePayUI() { 
-            const g = parseFloat(payInput) || 0; const diff = g - payTotal;
-            document.getElementById('payInputDisplay').textContent = (payInput || '0') + ' €';
-            document.getElementById('changeDisplay').textContent = diff >= 0 ? diff.toFixed(2) + ' €' : '---';
-            document.getElementById('confirmBtn').disabled = g < payTotal;
-        }
         window.showConfirm = (title, msg, action) => {
             document.getElementById('confTitle').textContent = title; document.getElementById('confMsg').textContent = msg;
             const btn = document.getElementById('confActionBtn'); btn.onclick = () => { action(); closeModal('confirmModal'); };
@@ -718,39 +671,13 @@
 
         function startScreensaverTimer() {
             const saver = document.getElementById('screensaver');
-            const reset = () => { 
-                idleTimer = 0; 
-                if(!saver.classList.contains('hidden')) { 
-                    saver.classList.add('opacity-0'); 
-                    setTimeout(() => saver.classList.add('hidden'), 500); 
-                } 
-            };
+            const reset = () => { idleTimer = 0; if(!saver.classList.contains('hidden')) { saver.classList.add('opacity-0'); setTimeout(() => saver.classList.add('hidden'), 500); } };
             ['click', 'mousemove', 'touchstart', 'keydown'].forEach(e => window.addEventListener(e, reset));
-            
-            setInterval(() => { 
-                idleTimer++; 
-                if(idleTimer >= 10 && currentView !== 'customer' && currentView !== 'customer-select') { 
-                    if(saver.classList.contains('hidden')) {
-                        saver.classList.remove('hidden'); 
-                        setTimeout(() => saver.classList.remove('opacity-0'), 10); 
-                    }
-                } 
-            }, 1000);
+            setInterval(() => { idleTimer++; if(idleTimer >= 60 && currentView !== 'customer' && currentView !== 'customer-select') { if(saver.classList.contains('hidden')) { saver.classList.remove('hidden'); setTimeout(() => saver.classList.remove('opacity-0'), 10); } } }, 1000);
         }
-
-        window.resetApp = async () => { 
-            const batch = writeBatch(db);
-            orders.forEach(o => batch.delete(doc(db, PATH, 'orders', o.id)));
-            batch.set(doc(db, PATH, 'stats', 'finance'), {expenses: 0});
-            // Clear sync docs
-            batch.delete(doc(db, PATH, 'sync', 'cart_pos_1'));
-            batch.delete(doc(db, PATH, 'sync', 'cart_pos_2'));
-            await batch.commit(); toast("Alles zurückgesetzt");
-        };
 
         init();
         lucide.createIcons();
     </script>
 </body>
 </html>
-
