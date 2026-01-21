@@ -41,7 +41,7 @@
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
 
-    <!-- === SCREENSAVER (MAIN) === -->
+    <!-- === SCREENSAVER === -->
     <div id="screensaver" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center hidden transition-opacity duration-500 cursor-pointer">
         <div class="text-center animate-pulse-glow">
             <div class="bg-indigo-600 w-32 h-32 rounded-3xl mx-auto flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-8">
@@ -50,7 +50,6 @@
             <h1 class="text-5xl font-black text-white tracking-tight mb-2">Winterball 2026</h1>
             <p id="screensaverSubtitle" class="text-2xl text-indigo-400 font-medium tracking-widest uppercase">GETRÄNKE</p>
         </div>
-        <p class="absolute bottom-10 text-slate-500 text-sm animate-bounce">Zum Aufwecken tippen</p>
     </div>
 
     <!-- === HEADER === -->
@@ -64,12 +63,12 @@
                 <div id="activePosIndicator" class="ml-2 px-2 py-0.5 bg-slate-800 rounded text-[10px] font-bold text-indigo-400 border border-indigo-500/30 uppercase tracking-widest">GETRÄNKE</div>
             </div>
             
-            <nav class="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700/50">
-                <button onclick="setView('order')" id="nav-order" class="px-4 py-1.5 text-sm font-medium rounded-lg transition-all bg-indigo-600 text-white">Verkauf</button>
-                <button onclick="setView('customer-select')" id="nav-customer-select" class="px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Kundenansicht</button>
-                <button onclick="setView('dashboard')" id="nav-dashboard" class="px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Dashboard</button>
-                <button onclick="setView('history')" id="nav-history" class="px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Historie</button>
-                <button onclick="tryInventoryAccess()" id="nav-inventory" class="px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Inventar</button>
+            <nav class="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700/50 overflow-x-auto">
+                <button onclick="setView('order')" id="nav-order" class="whitespace-nowrap px-4 py-1.5 text-sm font-medium rounded-lg transition-all bg-indigo-600 text-white">Verkauf</button>
+                <button onclick="setView('customer-select')" id="nav-customer-select" class="whitespace-nowrap px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Kundenansicht</button>
+                <button onclick="setView('dashboard')" id="nav-dashboard" class="whitespace-nowrap px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Dashboard</button>
+                <button onclick="setView('history')" id="nav-history" class="whitespace-nowrap px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Historie</button>
+                <button onclick="tryInventoryAccess()" id="nav-inventory" class="whitespace-nowrap px-4 py-1.5 text-sm font-medium rounded-lg transition-all text-slate-400">Inventar</button>
             </nav>
         </div>
     </header>
@@ -112,94 +111,99 @@
 
         <!-- VIEW: KUNDENANSICHT SELECTION -->
         <section id="customer-selectView" class="view-section hidden h-full flex flex-col items-center justify-center p-10">
-            <h2 class="text-3xl font-black text-white mb-8">Kundenansicht öffnen für:</h2>
+            <h2 class="text-3xl font-black text-white mb-8 text-center">Kundenansicht öffnen für:</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
                 <button onclick="openCustomerView(1)" class="bg-slate-800 hover:bg-indigo-600 border border-slate-700 p-10 rounded-3xl group transition-all">
                     <i data-lucide="cup-soda" class="w-12 h-12 text-indigo-400 group-hover:text-white mb-4 mx-auto"></i>
                     <span class="block text-2xl font-bold text-white">Kasse GETRÄNKE</span>
-                    <span class="text-slate-500 group-hover:text-indigo-200 text-sm">Synchronisiert mit Getränke-Kasse</span>
                 </button>
                 <button onclick="openCustomerView(2)" class="bg-slate-800 hover:bg-indigo-600 border border-slate-700 p-10 rounded-3xl group transition-all">
                     <i data-lucide="utensils" class="w-12 h-12 text-indigo-400 group-hover:text-white mb-4 mx-auto"></i>
                     <span class="block text-2xl font-bold text-white">Kasse SPEISEN</span>
-                    <span class="text-slate-500 group-hover:text-indigo-200 text-sm">Synchronisiert mit Speisen-Kasse</span>
                 </button>
             </div>
         </section>
 
-        <!-- VIEW: KUNDENANSICHT (LIVE) -->
+        <!-- VIEW: KUNDENANSICHT (Optimiertes Layout) -->
         <section id="customerView" class="view-section hidden h-full w-full bg-slate-950 flex flex-col items-center justify-center relative">
             <button onclick="setView('order')" class="absolute top-4 right-4 z-[60] p-2 text-slate-800 hover:text-slate-600 transition-colors">
                 <i data-lucide="log-out" class="w-6 h-6"></i>
             </button>
+            
             <div id="customerScreensaver" class="absolute inset-0 bg-slate-950 z-20 flex flex-col items-center justify-center transition-opacity duration-700">
                 <div class="text-center animate-pulse-glow">
-                    <div class="bg-indigo-600 w-40 h-40 rounded-[2.5rem] mx-auto flex items-center justify-center shadow-2xl shadow-indigo-500/20 mb-10">
-                        <i data-lucide="snowflake" class="text-white w-24 h-24"></i>
+                    <div class="bg-indigo-600 w-32 h-32 rounded-[2rem] mx-auto flex items-center justify-center shadow-2xl shadow-indigo-500/20 mb-8">
+                        <i data-lucide="snowflake" class="text-white w-20 h-20"></i>
                     </div>
-                    <h1 class="text-6xl font-black text-white tracking-tighter mb-4">Winterball 2026</h1>
-                    <p id="custSaverSubtitle" class="text-3xl text-indigo-400 font-bold uppercase tracking-widest">Kasse Getränke</p>
+                    <h1 class="text-5xl font-black text-white tracking-tighter mb-2">Winterball 2026</h1>
+                    <p id="custSaverSubtitle" class="text-2xl text-indigo-400 font-bold uppercase tracking-widest">Kasse Getränke</p>
                 </div>
             </div>
-            <div class="w-full max-w-4xl p-8 flex flex-col h-full z-10">
-                <div class="flex justify-between items-center mb-12">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center"><i data-lucide="shopping-cart" class="text-white w-6 h-6"></i></div>
-                        <h2 class="text-4xl font-black text-white">Deine Bestellung</h2>
+
+            <div class="w-full max-w-3xl p-6 flex flex-col h-full z-10">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center"><i data-lucide="shopping-cart" class="text-white w-5 h-5"></i></div>
+                        <h2 class="text-2xl font-black text-white">Ihre Bestellung</h2>
                     </div>
-                    <div id="customerPosTag" class="text-indigo-500 font-bold uppercase tracking-widest text-lg">GETRÄNKE</div>
+                    <div id="customerPosTag" class="text-indigo-500 font-bold uppercase tracking-widest text-sm">GETRÄNKE</div>
                 </div>
                 
-                <!-- Hauptbereich Kundenansicht -->
-                <div class="flex flex-col h-full gap-8">
-                    <!-- Warenkorb Liste -->
-                    <div id="customerCartItems" class="flex-grow space-y-4 overflow-y-auto custom-scrollbar pr-4 transition-all duration-300"></div>
+                <div class="flex flex-col h-full gap-4 overflow-hidden">
+                    <div id="customerCartItems" class="flex-grow space-y-2 overflow-y-auto custom-scrollbar pr-2"></div>
                     
-                    <!-- Zahlungs-Info Overlay (wird eingeblendet wenn Kassiert wird) -->
-                    <div id="customerPaymentOverlay" class="hidden bg-slate-900 border-2 border-indigo-500 rounded-[2.5rem] p-10 shadow-2xl shadow-indigo-500/10 animate-in fade-in zoom-in duration-300">
-                        <div class="grid grid-cols-2 gap-10">
+                    <div id="customerPaymentOverlay" class="hidden bg-slate-900 border-2 border-indigo-500 rounded-[2rem] p-6 shadow-2xl shadow-indigo-500/10">
+                        <div class="grid grid-cols-2 gap-6">
                             <div>
-                                <p class="text-slate-500 font-bold uppercase tracking-widest text-sm mb-2">Gegeben</p>
-                                <p id="customerGiven" class="text-7xl font-mono font-black text-white">0,00 €</p>
+                                <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px] mb-1">Gegeben</p>
+                                <p id="customerGiven" class="text-4xl font-mono font-black text-white">0,00 €</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-slate-500 font-bold uppercase tracking-widest text-sm mb-2">Rückgeld</p>
-                                <p id="customerChange" class="text-7xl font-mono font-black text-emerald-400">0,00 €</p>
+                                <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px] mb-1">Rückgeld</p>
+                                <p id="customerChange" class="text-4xl font-mono font-black text-emerald-400">0,00 €</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pt-10 border-t border-slate-800 flex justify-between items-end">
+                    <div class="pt-4 border-t border-slate-800 flex justify-between items-end">
                         <div>
-                            <p class="text-slate-500 font-bold uppercase tracking-widest mb-2">Gesamtsumme</p>
-                            <p id="customerTotal" class="text-9xl font-black text-white tracking-tighter">0,00 €</p>
+                            <p class="text-slate-500 font-bold uppercase tracking-widest text-xs mb-1">Gesamtsumme</p>
+                            <p id="customerTotal" class="text-6xl font-black text-white tracking-tighter">0,00 €</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- VIEW: DASHBOARD & HISTORY & INVENTORY (aus Vorversion übernommen) -->
+        <!-- VIEW: DASHBOARD (Inkl. Einkaufskosten) -->
         <section id="dashboardView" class="view-section hidden h-full overflow-y-auto p-6 md:p-10">
-            <!-- ... Gleiche Dashboard UI wie v15 ... -->
             <div class="max-w-4xl mx-auto space-y-8 pb-20">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-white">Finanzübersicht</h2>
+                    <div class="flex items-center gap-2 bg-slate-800 p-2 rounded-xl border border-slate-700">
+                        <span class="text-xs font-bold text-slate-400 px-2 uppercase tracking-wider">Einkaufskosten (€):</span>
+                        <input type="number" id="purchaseCostInput" value="0" step="0.01" oninput="updateDashboardStats()" class="w-24 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-white text-sm outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
                         <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Brutto-Umsatz</p>
                         <h3 class="text-3xl font-black text-white" id="statRevenue">0,00 €</h3>
                     </div>
-                    <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Netto-Gewinn</p>
+                    <div class="bg-slate-800 p-6 rounded-2xl border border-indigo-500/30 ring-1 ring-indigo-500/20">
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Reingewinn (Netto)</p>
                         <h3 class="text-3xl font-black text-emerald-400" id="statProfit">0,00 €</h3>
                     </div>
                     <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Verkäufe</p>
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Anzahl Verkäufe</p>
                         <h3 class="text-3xl font-black text-sky-400" id="statCount">0</h3>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- VIEW: HISTORY -->
         <section id="historyView" class="view-section hidden h-full overflow-y-auto p-6 md:p-10">
             <div class="max-w-3xl mx-auto">
                 <div class="flex justify-between items-center mb-8">
@@ -210,6 +214,7 @@
             </div>
         </section>
 
+        <!-- VIEW: INVENTORY -->
         <section id="inventoryView" class="view-section hidden h-full overflow-y-auto p-6 md:p-10">
              <div class="max-w-3xl mx-auto space-y-8">
                 <div class="flex justify-between items-center">
@@ -219,41 +224,32 @@
                 <div class="bg-slate-800 p-6 rounded-2xl border border-indigo-500/30">
                     <h3 id="formTitle" class="text-sm font-bold text-indigo-400 uppercase tracking-widest mb-4">Neuer Artikel</h3>
                     
-                    <div class="flex gap-4 mb-4 bg-slate-900/50 p-3 rounded-xl border border-slate-700">
-                        <span class="text-sm font-bold text-slate-400 my-auto flex items-center gap-2"><i data-lucide="monitor" class="w-4 h-4"></i> Verfügbar auf:</span>
+                    <div class="flex gap-4 mb-4 bg-slate-900/50 p-3 rounded-xl border border-slate-700 overflow-x-auto">
+                        <span class="text-sm font-bold text-slate-400 my-auto whitespace-nowrap">Kasse:</span>
                         <div class="flex items-center gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="radio" name="invPos" value="0" checked class="accent-indigo-500 w-4 h-4">
-                                <span class="text-white text-sm font-medium group-hover:text-indigo-300 transition-colors">Alle</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="radio" name="invPos" value="1" class="accent-indigo-500 w-4 h-4">
-                                <span class="text-white text-sm font-medium group-hover:text-indigo-300 transition-colors">Getränke</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="radio" name="invPos" value="2" class="accent-indigo-500 w-4 h-4">
-                                <span class="text-white text-sm font-medium group-hover:text-indigo-300 transition-colors">Speisen</span>
-                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer whitespace-nowrap"><input type="radio" name="invPos" value="0" checked class="accent-indigo-500"> Alle</label>
+                            <label class="flex items-center gap-2 cursor-pointer whitespace-nowrap"><input type="radio" name="invPos" value="1" class="accent-indigo-500"> Getränke</label>
+                            <label class="flex items-center gap-2 cursor-pointer whitespace-nowrap"><input type="radio" name="invPos" value="2" class="accent-indigo-500"> Speisen</label>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <input type="text" id="invName" placeholder="Produktname" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 transition-colors">
+                        <input type="text" id="invName" placeholder="Produktname" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500">
                         <div class="flex items-center gap-3 px-4 bg-slate-900 rounded-xl border border-slate-700">
                             <input type="checkbox" id="invHasVar" onchange="toggleInvInputs()" class="w-5 h-5 accent-indigo-500">
-                            <label for="invHasVar" class="text-sm text-slate-400 font-medium cursor-pointer select-none">Varianten (S/L)</label>
+                            <label for="invHasVar" class="text-sm text-slate-400 font-medium cursor-pointer">Varianten (S/L)</label>
                         </div>
                     </div>
                     <div id="invSingleInputs" class="grid grid-cols-2 gap-4 mb-4">
-                        <input type="number" id="invPrice" placeholder="Preis €" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 transition-colors">
-                        <input type="number" id="invStock" placeholder="Vorrat" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-indigo-500 transition-colors">
+                        <input type="number" id="invPrice" placeholder="Preis €" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none">
+                        <input type="number" id="invStock" placeholder="Vorrat" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none">
                     </div>
-                    <div id="invVarInputs" class="hidden grid grid-cols-2 gap-4 mb-4 p-4 bg-slate-900/50 rounded-xl border border-slate-700">
+                    <div id="invVarInputs" class="hidden grid grid-cols-2 gap-4 mb-4 p-4 bg-slate-900/50 rounded-xl">
                         <div class="space-y-2"><p class="text-xs font-bold text-slate-500">Klein (S)</p><input type="number" id="invPriceS" placeholder="€" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"><input type="number" id="invStockS" placeholder="Vorrat" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"></div>
                         <div class="space-y-2"><p class="text-xs font-bold text-slate-500">Groß (L)</p><input type="number" id="invPriceL" placeholder="€" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"><input type="number" id="invStockL" placeholder="Vorrat" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"></div>
                     </div>
-                    <button id="saveBtn" onclick="saveProduct()" class="w-full bg-emerald-600 py-3.5 rounded-xl text-white font-bold hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-500/20">Speichern</button>
-                    <button id="cancelEditBtn" onclick="resetForm()" class="hidden w-full mt-2 text-slate-500 py-2 hover:text-white transition-colors">Abbrechen</button>
+                    <button id="saveBtn" onclick="saveProduct()" class="w-full bg-emerald-600 py-3.5 rounded-xl text-white font-bold hover:bg-emerald-500">Speichern</button>
+                    <button id="cancelEditBtn" onclick="resetForm()" class="hidden w-full mt-2 text-slate-500 py-2">Abbrechen</button>
                 </div>
                 <div id="inventoryList" class="space-y-3"></div>
             </div>
@@ -261,11 +257,9 @@
     </main>
 
     <!-- === MODALS === -->
-    <!-- Pin, Size, Payment, Confirm (aus Vorversion übernommen) -->
     <div id="pinModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl hidden z-[80] flex items-center justify-center p-4 transition-all opacity-0">
         <div class="max-w-sm w-full space-y-8">
             <div class="text-center">
-                <div class="bg-slate-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-700"><i data-lucide="lock" class="text-indigo-400 w-6 h-6"></i></div>
                 <h2 class="text-2xl font-bold text-white">PIN erforderlich</h2>
                 <div class="flex justify-center gap-4 mt-6">
                     <div id="pinDot1" class="w-4 h-4 rounded-full border-2 border-slate-700"></div>
@@ -287,8 +281,8 @@
         <div class="bg-slate-800 rounded-3xl p-8 max-w-sm w-full border border-slate-700">
             <h3 class="text-2xl font-bold text-white text-center mb-8">Größe wählen</h3>
             <div class="grid grid-cols-2 gap-4">
-                <button onclick="chooseSize('small')" class="bg-slate-700 rounded-2xl p-6 flex flex-col items-center gap-2"><i data-lucide="cup-soda" class="w-8 h-8 text-indigo-400"></i><span class="font-bold text-white">KLEIN</span><span id="priceSDisplay" class="text-indigo-300">0.00€</span></button>
-                <button onclick="chooseSize('large')" class="bg-slate-700 rounded-2xl p-6 flex flex-col items-center gap-2"><i data-lucide="beer" class="w-8 h-8 text-indigo-400"></i><span class="font-bold text-white">GROSS</span><span id="priceLDisplay" class="text-indigo-300">0.00€</span></button>
+                <button onclick="chooseSize('small')" class="bg-slate-700 rounded-2xl p-6 flex flex-col items-center gap-2"><span class="font-bold text-white">KLEIN</span><span id="priceSDisplay" class="text-indigo-300">0.00€</span></button>
+                <button onclick="chooseSize('large')" class="bg-slate-700 rounded-2xl p-6 flex flex-col items-center gap-2"><span class="font-bold text-white">GROSS</span><span id="priceLDisplay" class="text-indigo-300">0.00€</span></button>
             </div>
             <button onclick="closeModal('sizeModal')" class="w-full mt-8 text-slate-500">Abbrechen</button>
         </div>
@@ -320,7 +314,7 @@
 
     <div id="confirmModal" class="fixed inset-0 bg-black/80 hidden z-[90] flex items-center justify-center p-6 transition-all opacity-0">
         <div class="bg-slate-800 p-8 rounded-3xl max-w-sm w-full border border-slate-700 shadow-2xl">
-            <h3 id="confTitle" class="text-xl font-bold text-white mb-2">Titel</h3><p id="confMsg" class="text-slate-400 mb-8">Nachricht</p>
+            <h3 id="confTitle" class="text-xl font-bold text-white mb-2">Bestätigen</h3><p id="confMsg" class="text-slate-400 mb-8">...</p>
             <div class="flex gap-3"><button onclick="closeModal('confirmModal')" class="flex-1 py-3 text-slate-500 font-bold">Abbrechen</button><button id="confActionBtn" class="flex-1 bg-rose-600 py-3 rounded-xl text-white font-bold">Bestätigen</button></div>
         </div>
     </div>
@@ -330,7 +324,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, writeBatch, serverTimestamp, deleteDoc, increment, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'winter-kasse-v16';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'winter-kasse-v18';
         const firebaseConfig = {
   apiKey: "AIzaSyCek4vZ4kfbz42u5jBym1DakFmdnmpV5nY",
   authDomain: "winterball26.firebaseapp.com",
@@ -350,17 +344,13 @@
         let payInput = "";
         let payTotal = 0;
         let idleTimer = 0;
-        let totalExpenses = 0;
         let selectedProductForVar = null;
         let currentView = 'order';
-        
         let currentPos = 1; 
         let currentCustomerPos = 1;
         let customerSyncUnsubscribe = null;
 
-        function getPosName(num) {
-            return num === 1 ? "GETRÄNKE" : "SPEISEN";
-        }
+        let localCart = [];
 
         async function init() {
             if (!firebaseConfig) return;
@@ -376,9 +366,15 @@
                     userId = u.uid;
                     startDataListeners();
                     startScreensaverTimer();
+                    
+                    // Lade Einkaufskosten aus lokalem Speicher (oder optional Firestore falls gewünscht)
+                    const savedCost = localStorage.getItem('winterball_purchase_cost');
+                    if(savedCost) document.getElementById('purchaseCostInput').value = savedCost;
                 }
             });
         }
+
+        function getPosName(num) { return num === 1 ? "GETRÄNKE" : "SPEISEN"; }
 
         window.setPOS = (num) => {
             currentPos = num;
@@ -387,116 +383,146 @@
             document.getElementById('pos-btn-2').className = num === 2 ? "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white" : "px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-400";
             document.getElementById('activePosIndicator').textContent = posName;
             document.getElementById('screensaverSubtitle').textContent = posName;
-            
             localCart = [];
             updateCartUI();
             renderProductGrid();
             toast(`Auf ${posName} gewechselt`);
         };
 
-        // --- KUNDENANSICHT LOGIK ---
         window.openCustomerView = (num) => {
             currentCustomerPos = num;
-            const posName = getPosName(num);
-            document.getElementById('customerPosTag').textContent = posName;
-            document.getElementById('custSaverSubtitle').textContent = "KASSE " + posName;
-            
+            document.getElementById('customerPosTag').textContent = getPosName(num);
+            document.getElementById('custSaverSubtitle').textContent = "KASSE " + getPosName(num);
             if(customerSyncUnsubscribe) customerSyncUnsubscribe();
-            
             customerSyncUnsubscribe = onSnapshot(doc(db, PATH, 'sync', `cart_pos_${num}`), docSnap => {
-                if(docSnap.exists()) {
-                    const data = docSnap.data();
-                    renderCustomerCart(data);
-                } else {
-                    renderCustomerCart({ items: [], total: 0 });
-                }
+                if(docSnap.exists()) renderCustomerCart(docSnap.data());
+                else renderCustomerCart({ items: [], total: 0 });
             }, (e) => console.error(e));
-
             setView('customer');
         };
 
         function renderCustomerCart(data) {
             const items = data.items || [];
             const total = data.total || 0;
-            const isPaying = data.isPaying || false;
-            const given = data.given || 0;
-            const change = data.change || 0;
-
             const saver = document.getElementById('customerScreensaver');
             const list = document.getElementById('customerCartItems');
-            const totalDisplay = document.getElementById('customerTotal');
             const overlay = document.getElementById('customerPaymentOverlay');
             
-            // Screensaver Handling
-            if(items.length > 0 || isPaying) saver.classList.add('opacity-0', 'pointer-events-none');
+            if(items.length > 0 || data.isPaying) saver.classList.add('opacity-0', 'pointer-events-none');
             else saver.classList.remove('opacity-0', 'pointer-events-none');
 
-            // Warenkorb Liste (nur anzeigen wenn nicht gerade kassiert wird, für mehr Fokus)
             list.innerHTML = '';
-            if(!isPaying) {
+            if(!data.isPaying) {
                 list.classList.remove('hidden');
                 items.forEach(item => {
                     const div = document.createElement('div');
-                    div.className = "flex justify-between items-center p-5 bg-slate-900 border border-slate-800 rounded-3xl animate-in slide-in-from-right-4 duration-300";
-                    div.innerHTML = `<span class="text-3xl font-black text-white">${item.name}</span><span class="text-3xl font-mono text-indigo-400">${item.price.toFixed(2)} €</span>`;
+                    div.className = "flex justify-between items-center px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-2xl animate-in fade-in zoom-in-95 duration-200";
+                    div.innerHTML = `<span class="text-lg font-bold text-white">${item.count}x ${item.name}</span><span class="text-lg font-mono font-bold text-indigo-400">${(item.price * item.count).toFixed(2)} €</span>`;
                     list.appendChild(div);
                 });
             } else {
                 list.classList.add('hidden');
             }
 
-            // Zahlungs Overlay
-            if(isPaying) {
+            if(data.isPaying) {
                 overlay.classList.remove('hidden');
-                document.getElementById('customerGiven').textContent = given.toFixed(2) + ' €';
-                document.getElementById('customerChange').textContent = (given >= total) ? change.toFixed(2) + ' €' : '---';
-            } else {
-                overlay.classList.add('hidden');
-            }
-
-            totalDisplay.textContent = total.toFixed(2) + ' €';
+                document.getElementById('customerGiven').textContent = (data.given || 0).toFixed(2) + ' €';
+                document.getElementById('customerChange').textContent = (data.change || 0).toFixed(2) + ' €';
+            } else { overlay.classList.add('hidden'); }
+            document.getElementById('customerTotal').textContent = total.toFixed(2) + ' €';
         }
 
-        // --- VERKAUF / WARENKORB LOGIK ---
-        let localCart = [];
         window.addToCart = (name, price, isVariant, isLarge, parent) => {
-            localCart.push({ name, price, isVariant, isLarge, parent: parent || name });
+            const existing = localCart.find(i => i.name === name);
+            if(existing) {
+                existing.count++;
+            } else {
+                localCart.push({ name, price, isVariant, isLarge, parent: parent || name, count: 1 });
+            }
             syncCartToFirebase(false); 
             updateCartUI();
         };
 
-        window.remFromCart = (idx) => { localCart.splice(idx,1); syncCartToFirebase(false); updateCartUI(); };
+        window.remFromCart = (idx) => { 
+            if(localCart[idx].count > 1) {
+                localCart[idx].count--;
+            } else {
+                localCart.splice(idx,1); 
+            }
+            syncCartToFirebase(false); 
+            updateCartUI(); 
+        };
+
         window.clearCart = () => { localCart = []; syncCartToFirebase(false); updateCartUI(); };
 
-        // Erweiterte Sync Funktion für Bezahlvorgang
         async function syncCartToFirebase(isPaying = false) {
-            const total = localCart.reduce((a,b) => a + b.price, 0);
+            const total = localCart.reduce((a,b) => a + (b.price * b.count), 0);
             const given = parseFloat(payInput) || 0;
-            const change = given - total;
-
             await setDoc(doc(db, PATH, 'sync', `cart_pos_${currentPos}`), { 
                 items: localCart, 
                 total: total, 
                 isPaying: isPaying,
                 given: given,
-                change: change,
+                change: given - total,
                 lastUpdate: serverTimestamp() 
             });
         }
 
-        window.showPaymentModal = () => { 
-            payInput = ""; 
-            updatePayUI(); 
-            document.getElementById('payTotalDisplay').textContent = payTotal.toFixed(2) + ' €'; 
-            openModal('paymentModal'); 
-            syncCartToFirebase(true); // Kundenansicht auf Bezahl-Modus schalten
+        window.updateCartUI = () => {
+            const list = document.getElementById('cartItemsList'); list.innerHTML = '';
+            payTotal = 0;
+            localCart.forEach((item, idx) => {
+                const subtotal = item.price * item.count;
+                payTotal += subtotal;
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-slate-700/30 p-3 rounded-xl border border-slate-700/50";
+                div.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="text-sm font-bold text-white">${item.count}x ${item.name}</span>
+                        <span class="text-[10px] text-slate-500">${subtotal.toFixed(2)}€</span>
+                    </div>
+                    <button onclick="remFromCart(${idx})" class="text-rose-500 p-2"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>`;
+                list.appendChild(div);
+            });
+            document.getElementById('cartTotalDisplay').textContent = payTotal.toFixed(2) + ' €';
+            document.getElementById('payBtn').disabled = localCart.length === 0;
+            lucide.createIcons();
         };
 
-        window.closePaymentModal = () => {
-            closeModal('paymentModal');
-            syncCartToFirebase(false); // Zurück zur normalen Ansicht
+        window.deleteOrder = (id) => {
+            showConfirm('Stornieren?', 'Dieser Verkauf wird rückgängig gemacht. Bestände werden wieder erhöht.', async () => {
+                try {
+                    const docRef = doc(db, PATH, 'orders', id);
+                    const snap = await getDoc(docRef);
+                    if (!snap.exists()) return;
+                    
+                    const orderData = snap.data();
+                    const batch = writeBatch(db);
+                    
+                    if (orderData.items) {
+                        orderData.items.forEach(item => {
+                            const invRef = doc(db, PATH, 'inventory', item.parent);
+                            const count = item.count || 1;
+                            if (item.isVariant) {
+                                batch.update(invRef, item.isLarge ? {stockL: increment(count)} : {stockS: increment(count)});
+                            } else {
+                                batch.update(invRef, {stock: increment(count)});
+                            }
+                        });
+                    }
+                    
+                    batch.delete(docRef);
+                    await batch.commit();
+                    toast("Stornierung erfolgreich!");
+                } catch (e) {
+                    console.error(e);
+                    toast("Fehler beim Stornieren");
+                }
+            });
         };
 
+        window.showPaymentModal = () => { payInput = ""; updatePayUI(); document.getElementById('payTotalDisplay').textContent = payTotal.toFixed(2) + ' €'; openModal('paymentModal'); syncCartToFirebase(true); };
+        window.closePaymentModal = () => { closeModal('paymentModal'); syncCartToFirebase(false); };
         window.addPayNum = (n) => { payInput += n; updatePayUI(); syncCartToFirebase(true); };
         window.clearPayNum = () => { payInput = ""; updatePayUI(); syncCartToFirebase(true); };
         window.setQuickCash = (v) => { payInput = v.toString(); updatePayUI(); syncCartToFirebase(true); };
@@ -511,26 +537,16 @@
         window.processSale = async () => {
             const batch = writeBatch(db);
             const orderRef = doc(collection(db, PATH, 'orders'));
-            batch.set(orderRef, { 
-                items: localCart, 
-                total: payTotal, 
-                timestamp: serverTimestamp(),
-                pos: currentPos
-            });
+            batch.set(orderRef, { items: localCart, total: payTotal, timestamp: serverTimestamp(), pos: currentPos });
             localCart.forEach(item => {
                 const invRef = doc(db, PATH, 'inventory', item.parent);
-                batch.update(invRef, item.isVariant ? (item.isLarge ? {stockL: increment(-1)} : {stockS: increment(-1)}) : {stock: increment(-1)});
+                const count = item.count;
+                batch.update(invRef, item.isVariant ? (item.isLarge ? {stockL: increment(-count)} : {stockS: increment(-count)}) : {stock: increment(-count)});
             });
             await batch.commit();
-            localCart = []; 
-            payInput = "";
-            syncCartToFirebase(false); // Resetet die Kundenansicht (löscht Warenkorb dort)
-            updateCartUI();
-            closeModal('paymentModal'); 
-            toast("Erfolgreich gebucht!");
+            localCart = []; payInput = ""; syncCartToFirebase(false); updateCartUI();
+            closeModal('paymentModal'); toast("Gebucht!");
         };
-
-        // --- HILFSFUNKTIONEN & LISTENERS (aus v15) ---
 
         function startDataListeners() {
             onSnapshot(collection(db, PATH, 'inventory'), snap => {
@@ -539,60 +555,37 @@
             });
             onSnapshot(collection(db, PATH, 'orders'), snap => {
                 orders = []; snap.forEach(d => orders.push({id: d.id, ...d.data()}));
-                renderDashboard(); renderHistory();
+                updateDashboardStats(); renderHistory();
             });
-            onSnapshot(doc(db, PATH, 'stats', 'finance'), docSnap => {
-                if (docSnap.exists()) {
-                    totalExpenses = docSnap.data().expenses || 0;
-                    renderDashboard();
-                }
-            });
-        }
-
-        window.setView = (id) => {
-            currentView = id;
-            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
-            document.getElementById(id + 'View').classList.remove('hidden');
-            document.querySelectorAll('nav button').forEach(b => {
-                b.classList.remove('bg-indigo-600', 'text-white');
-                b.classList.add('text-slate-400');
-            });
-            const activeBtn = document.getElementById('nav-' + id);
-            if(activeBtn) { activeBtn.classList.replace('text-slate-400', 'text-white'); activeBtn.classList.add('bg-indigo-600'); }
-            document.getElementById('mainHeader').classList.toggle('hidden', id === 'customer');
-        };
-
-        function updateCartUI() {
-            const list = document.getElementById('cartItemsList'); list.innerHTML = '';
-            payTotal = 0;
-            localCart.forEach((item, idx) => {
-                payTotal += item.price;
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center bg-slate-700/30 p-3 rounded-xl border border-slate-700/50";
-                div.innerHTML = `<div class="flex flex-col"><span class="text-sm font-bold text-white">${item.name}</span><span class="text-[10px] text-slate-500">${item.price.toFixed(2)}€</span></div><button onclick="remFromCart(${idx})" class="text-rose-500 p-2"><i data-lucide="x" class="w-4 h-4"></i></button>`;
-                list.appendChild(div);
-            });
-            document.getElementById('cartTotalDisplay').textContent = payTotal.toFixed(2) + ' €';
-            document.getElementById('payBtn').disabled = localCart.length === 0;
-            lucide.createIcons();
         }
 
         window.renderProductGrid = () => {
             const grid = document.getElementById('productGrid'); grid.innerHTML = '';
             Object.keys(inventory).sort().forEach(name => {
                 const item = inventory[name];
-                const itemPos = item.assignedPos !== undefined ? item.assignedPos : 0;
-                if (itemPos === 0 || itemPos === currentPos) {
+                if ((item.assignedPos || 0) === 0 || item.assignedPos === currentPos) {
                     const card = document.createElement('div');
                     card.className = `product-card p-5 rounded-2xl flex flex-col justify-between h-44 cursor-pointer border border-slate-700/50`;
                     card.onclick = () => {
                         if(item.hasVariants) { selectedProductForVar = name; openModal('sizeModal'); document.getElementById('priceSDisplay').textContent = item.priceS+'€'; document.getElementById('priceLDisplay').textContent = item.priceL+'€'; }
                         else { addToCart(name, item.price, false, false); }
                     };
-                    card.innerHTML = `<div class="font-extrabold text-white">${name}</div><div class="text-indigo-400 font-bold">${item.hasVariants ? item.priceS+'/'+item.priceL+'€' : item.price.toFixed(2)+'€'}</div><div class="text-[10px] text-slate-500">Vorrat: ${item.hasVariants ? 'S:'+item.stockS+' L:'+item.stockL : item.stock}</div>`;
+                    card.innerHTML = `<div class="font-extrabold text-white text-lg leading-tight">${name}</div><div class="text-indigo-400 font-bold">${item.hasVariants ? item.priceS+'/'+item.priceL+'€' : item.price.toFixed(2)+'€'}</div><div class="text-[10px] text-slate-500">Bestand: ${item.hasVariants ? 'S:'+item.stockS+' L:'+item.stockL : item.stock}</div>`;
                     grid.appendChild(card);
                 }
             });
+        };
+
+        window.setView = (id) => {
+            currentView = id;
+            document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+            document.getElementById(id + 'View').classList.remove('hidden');
+            document.querySelectorAll('nav button').forEach(b => { b.classList.remove('bg-indigo-600', 'text-white'); b.classList.add('text-slate-400'); });
+            const activeBtn = document.getElementById('nav-' + id);
+            if(activeBtn) { activeBtn.classList.replace('text-slate-400', 'text-white'); activeBtn.classList.add('bg-indigo-600'); }
+            document.getElementById('mainHeader').classList.toggle('hidden', id === 'customer');
+            
+            if(id === 'dashboard') updateDashboardStats();
         };
 
         window.chooseSize = (s) => {
@@ -603,28 +596,32 @@
             closeModal('sizeModal');
         };
 
-        window.renderDashboard = () => {
+        window.updateDashboardStats = () => {
             const rev = orders.reduce((a,b) => a + b.total, 0);
+            const purchaseCost = parseFloat(document.getElementById('purchaseCostInput').value) || 0;
+            localStorage.setItem('winterball_purchase_cost', purchaseCost);
+
             document.getElementById('statRevenue').textContent = rev.toFixed(2) + ' €';
-            document.getElementById('statProfit').textContent = (rev - totalExpenses).toFixed(2) + ' €';
+            document.getElementById('statProfit').textContent = (rev - purchaseCost).toFixed(2) + ' €';
             document.getElementById('statCount').textContent = orders.length;
         };
-
-        window.tryInventoryAccess = () => { currentPin = ""; updatePinDots(); openModal('pinModal'); };
-        window.addPin = (n) => { if(currentPin.length < 4) { currentPin += n; updatePinDots(); if(currentPin === "5657") { closeModal('pinModal'); setView('inventory'); } } };
-        function updatePinDots() { for(let i=1;i<=4;i++) document.getElementById('pinDot'+i).className = currentPin.length >= i ? "w-4 h-4 rounded-full bg-indigo-500" : "w-4 h-4 rounded-full border-2 border-slate-700"; }
-        window.clearPin = () => { currentPin = ""; updatePinDots(); };
 
         window.renderHistory = () => {
             const l = document.getElementById('historyList'); l.innerHTML = '';
             orders.sort((a,b) => (b.timestamp?.seconds||0)-(a.timestamp?.seconds||0)).forEach(o => {
                 const div = document.createElement('div');
                 div.className = "bg-slate-800 border border-slate-700 p-4 rounded-2xl flex justify-between items-center";
-                div.innerHTML = `<div><p class="font-bold text-white">${o.total.toFixed(2)} €</p><p class="text-[10px] text-slate-500">${o.timestamp ? new Date(o.timestamp.seconds*1000).toLocaleString() : '...'}</p></div><button onclick="deleteOrder('${o.id}')" class="text-rose-500"><i data-lucide="rotate-ccw" class="w-5 h-5"></i></button>`;
+                div.innerHTML = `<div><p class="font-bold text-white">${o.total.toFixed(2)} €</p><p class="text-[10px] text-slate-500">${o.timestamp ? new Date(o.timestamp.seconds*1000).toLocaleString() : '...'}</p></div><button onclick="deleteOrder('${o.id}')" class="text-rose-500 p-2"><i data-lucide="rotate-ccw" class="w-5 h-5"></i></button>`;
                 l.appendChild(div);
             });
+            document.getElementById('historyCount').textContent = orders.length + " Buchungen";
             lucide.createIcons();
         };
+
+        window.tryInventoryAccess = () => { currentPin = ""; updatePinDots(); openModal('pinModal'); };
+        window.addPin = (n) => { if(currentPin.length < 4) { currentPin += n; updatePinDots(); if(currentPin === "5657") { closeModal('pinModal'); setView('inventory'); } } };
+        function updatePinDots() { for(let i=1;i<=4;i++) document.getElementById('pinDot'+i).className = currentPin.length >= i ? "w-4 h-4 rounded-full bg-indigo-500" : "w-4 h-4 rounded-full border-2 border-slate-700"; }
+        window.clearPin = () => { currentPin = ""; updatePinDots(); };
 
         window.saveProduct = async () => {
             const n = document.getElementById('invName').value;
@@ -673,7 +670,7 @@
             const saver = document.getElementById('screensaver');
             const reset = () => { idleTimer = 0; if(!saver.classList.contains('hidden')) { saver.classList.add('opacity-0'); setTimeout(() => saver.classList.add('hidden'), 500); } };
             ['click', 'mousemove', 'touchstart', 'keydown'].forEach(e => window.addEventListener(e, reset));
-            setInterval(() => { idleTimer++; if(idleTimer >= 60 && currentView !== 'customer' && currentView !== 'customer-select') { if(saver.classList.contains('hidden')) { saver.classList.remove('hidden'); setTimeout(() => saver.classList.remove('opacity-0'), 10); } } }, 1000);
+            setInterval(() => { idleTimer++; if(idleTimer >= 90 && currentView !== 'customer') { if(saver.classList.contains('hidden')) { saver.classList.remove('hidden'); setTimeout(() => saver.classList.remove('opacity-0'), 10); } } }, 1000);
         }
 
         init();
