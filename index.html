@@ -39,6 +39,50 @@
             transition: all 0.1s;
         }
         .num-btn:active { background-color: #334155; transform: scale(0.95); }
+
+        /* --- VIEW TRANSITIONS --- */
+        .view-section {
+            animation: viewIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes viewIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        nav button { transition: background-color 0.2s ease, color 0.2s ease; }
+
+        /* --- SALE SUCCESS ANIMATION --- */
+        @keyframes successPop {
+            0% { opacity: 0; transform: scale(0.6); }
+            50% { opacity: 1; transform: scale(1.08); }
+            70% { transform: scale(0.97); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes successCheck {
+            0% { stroke-dashoffset: 48; }
+            100% { stroke-dashoffset: 0; }
+        }
+        @keyframes successRingPulse {
+            0% { transform: scale(0.8); opacity: 0.6; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+        @keyframes successFadeOut {
+            0%, 75% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .sale-success-overlay {
+            animation: successFadeOut 1.7s ease forwards;
+        }
+        .sale-success-card {
+            animation: successPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .sale-success-ring {
+            animation: successRingPulse 1.2s ease-out infinite;
+        }
+        .sale-success-check {
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: successCheck 0.5s ease-out 0.15s forwards;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
@@ -94,14 +138,10 @@
         <!-- VIEW: VERKAUF -->
         <section id="orderView" class="view-section h-full flex flex-col md:flex-row gap-0 md:gap-6 p-2 md:p-6">
             <div class="flex-1 flex flex-col min-h-0">
-                <div class="flex gap-2 mb-3 bg-slate-800/30 p-1 rounded-xl w-fit border border-slate-700/50 flex-none">
-                    <button onclick="setPOS(1)" id="pos-btn-1" class="px-4 py-2 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white">GETRÄNKE</button>
-                    <button onclick="setPOS(2)" id="pos-btn-2" class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-400">SPEISEN</button>
-                </div>
-                <div class="flex items-center gap-2 mb-3 flex-none">
-                    <div class="relative flex-1">
-                        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
-                        <input type="text" id="productSearch" oninput="renderProductGrid()" placeholder="Produkt suchen..." class="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white text-sm outline-none focus:border-indigo-500 transition-all">
+                <div class="flex items-center justify-between gap-2 mb-4 flex-none">
+                    <div class="flex gap-1 bg-slate-800/30 p-1 rounded-xl border border-slate-700/50">
+                        <button onclick="setPOS(1)" id="pos-btn-1" class="px-4 py-2 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white">GETRÄNKE</button>
+                        <button onclick="setPOS(2)" id="pos-btn-2" class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-400">SPEISEN</button>
                     </div>
                     <button onclick="openDonationModal()" class="flex-none bg-slate-800/50 hover:bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold text-amber-400 flex items-center gap-2 transition-all active:scale-95">
                         <i data-lucide="gift" class="w-4 h-4"></i> Spende
@@ -160,6 +200,23 @@
                     </div>
                     <h1 class="text-5xl font-black text-white tracking-tighter mb-2">Winterball</h1>
                     <p id="custSaverSubtitle" class="text-2xl text-indigo-400 font-bold uppercase tracking-widest">Kasse Getränke</p>
+                </div>
+            </div>
+
+            <div id="customerSuccessOverlay" class="hidden absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-md flex items-center justify-center">
+                <div class="sale-success-card flex flex-col items-center gap-6">
+                    <div class="relative flex items-center justify-center">
+                        <div class="sale-success-ring absolute w-36 h-36 rounded-full border-4 border-emerald-400"></div>
+                        <div class="w-36 h-36 rounded-full bg-emerald-500 flex items-center justify-center shadow-2xl shadow-emerald-500/30">
+                            <svg width="72" height="72" viewBox="0 0 24 24" fill="none">
+                                <path class="sale-success-check" d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-white font-black text-4xl" id="customerSuccessAmount">0,00 €</p>
+                        <p class="text-emerald-400 font-bold text-lg uppercase tracking-widest mt-2">Vielen Dank!</p>
+                    </div>
                 </div>
             </div>
 
@@ -253,7 +310,7 @@
                         </div>
                         <div class="space-y-1">
                             <label class="text-[10px] text-slate-500 uppercase font-bold ml-1">Soll (Start + Umsatz)</label>
-                            <div id="cashSollDisplay" class="bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2.5 font-mono text-slate-300">0,00 €</div>
+                            <div id="cashSollDisplay" class="bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2.5 font-mono text-slate-300 whitespace-nowrap overflow-hidden text-ellipsis leading-normal">0,00 €</div>
                         </div>
                         <div class="space-y-1">
                             <label class="text-[10px] text-slate-500 uppercase font-bold ml-1">Ist (nachgezählt)</label>
@@ -539,6 +596,24 @@
         </div>
     </div>
 
+    <!-- SALE SUCCESS OVERLAY -->
+    <div id="saleSuccessOverlay" class="hidden fixed inset-0 z-[95] bg-slate-950/80 backdrop-blur-md flex items-center justify-center pointer-events-none">
+        <div class="sale-success-card flex flex-col items-center gap-4">
+            <div class="relative flex items-center justify-center">
+                <div class="sale-success-ring absolute w-24 h-24 rounded-full border-4 border-emerald-400"></div>
+                <div class="w-24 h-24 rounded-full bg-emerald-500 flex items-center justify-center shadow-2xl shadow-emerald-500/30">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                        <path class="sale-success-check" d="M5 13l4 4L19 7" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-white font-black text-2xl" id="saleSuccessAmount">0,00 €</p>
+                <p class="text-emerald-400 font-bold text-sm uppercase tracking-widest">Verkauft</p>
+            </div>
+        </div>
+    </div>
+
     <!-- FIREBASE & LOGIK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -724,17 +799,17 @@
         function renderProductGrid() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
-            const query = (document.getElementById('productSearch')?.value || '').trim().toLowerCase();
 
-            Object.keys(inventory).sort().filter(name => name.toLowerCase().includes(query)).filter(name => {
+            Object.keys(inventory).sort().filter(name => {
                 const pos = inventory[name].assignedPos || 0;
                 return pos === 0 || pos === currentPos;
             }).forEach(name => {
                 const item = inventory[name];
                 const card = document.createElement('div');
                 const outOfStock = item.hasVariants ? (item.stockS <= 0 && item.stockL <= 0) : (item.stock <= 0);
+                const lowStock = !outOfStock && (item.hasVariants ? (item.stockS + item.stockL) <= 5 : item.stock <= 5);
                 
-                card.className = `product-card p-5 rounded-2xl flex flex-col justify-between h-44 cursor-pointer border border-slate-700/50 hover:border-indigo-500/50 ${outOfStock ? 'out-of-stock' : ''}`;
+                card.className = `product-card p-4 rounded-2xl flex flex-col justify-between h-32 cursor-pointer border border-slate-700/50 hover:border-indigo-500/50 ${outOfStock ? 'out-of-stock' : ''}`;
                 card.onclick = () => {
                     if(item.hasVariants) {
                         selectedProductForVar = name;
@@ -747,24 +822,13 @@
                     }
                 };
 
-                let icon = 'glass-water';
-                if(name.toLowerCase().includes('bier')) icon = 'beer';
-                if(name.toLowerCase().includes('wein')) icon = 'wine';
-                if(name.toLowerCase().includes('essen')) icon = 'utensils';
-
                 card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <span class="font-extrabold text-white leading-tight pr-2">${name}</span>
-                        <i data-lucide="${icon}" class="text-slate-600 w-5 h-5"></i>
-                    </div>
-                    <div class="mt-2 font-mono text-indigo-400 font-bold">
-                        ${item.hasVariants ? `${item.priceS} / ${item.priceL}€` : `${item.price.toFixed(2)} €`}
-                    </div>
-                    <div class="mt-auto pt-3">
-                        <div class="text-[11px] font-medium text-slate-400 mb-1.5 flex justify-between">
-                             <span>Vorrat:</span>
-                             <span class="${outOfStock ? 'text-rose-500' : 'text-slate-300'} font-mono">${item.hasVariants ? `S:${item.stockS} L:${item.stockL}` : item.stock}</span>
+                    <div class="font-bold text-white text-sm leading-tight line-clamp-2">${name}</div>
+                    <div class="flex items-end justify-between">
+                        <div class="font-mono text-indigo-400 font-black text-lg">
+                            ${item.hasVariants ? `${item.priceS}/${item.priceL}€` : `${item.price.toFixed(2)}€`}
                         </div>
+                        ${(lowStock || outOfStock) ? `<span class="text-[9px] font-bold ${outOfStock ? 'text-rose-500' : 'text-amber-400'} font-mono">${outOfStock ? 'LEER' : (item.hasVariants ? `S${item.stockS}/L${item.stockL}` : item.stock)}</span>` : ''}
                     </div>
                 `;
                 grid.appendChild(card);
@@ -837,7 +901,29 @@
             syncCartToFirebase(false);
         }
 
-        // --- KUNDENANSICHT (Live-Sync) ---
+        // --- VERKAUFS-ERFOLGSANIMATION ---
+        function showSaleSuccess(amount) {
+            const overlay = document.getElementById('saleSuccessOverlay');
+            const amountEl = document.getElementById('saleSuccessAmount');
+            amountEl.textContent = fmtEUR(amount);
+            overlay.classList.remove('hidden');
+            // Animation neu starten
+            overlay.style.animation = 'none';
+            overlay.offsetHeight; // reflow erzwingen
+            overlay.style.animation = '';
+            setTimeout(() => overlay.classList.add('hidden'), 1700);
+        }
+
+        async function syncSaleCompleted(amount) {
+            if (!db) return;
+            try {
+                await setDoc(doc(db, PATH, 'sync', `cart_pos_${currentPos}`), {
+                    items: [], total: 0, isPaying: false, given: 0, change: 0,
+                    justCompleted: true, completedTotal: amount, completedAt: Date.now(),
+                    lastUpdate: serverTimestamp()
+                });
+            } catch (e) { console.error("Sync-Fehler:", e); }
+        }
         async function syncCartToFirebase(isPaying) {
             if (!db) return;
             const given = parseFloat(payInput) || 0;
@@ -870,15 +956,27 @@
             setView('order');
         };
 
+        let lastShownCompletionTs = 0;
+
         function renderCustomerCart(data) {
             const items = data.items || [];
             const total = data.total || 0;
             const saver = document.getElementById('customerScreensaver');
             const list = document.getElementById('customerCartItems');
             const overlay = document.getElementById('customerPaymentOverlay');
+            const successOverlay = document.getElementById('customerSuccessOverlay');
+
+            // Erfolgsanimation bei frisch abgeschlossenem Verkauf
+            if (data.justCompleted && data.completedAt && data.completedAt !== lastShownCompletionTs) {
+                lastShownCompletionTs = data.completedAt;
+                document.getElementById('customerSuccessAmount').textContent = fmtEUR(data.completedTotal || 0);
+                successOverlay.classList.remove('hidden');
+                saver.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => successOverlay.classList.add('hidden'), 2200);
+            }
 
             if (items.length > 0 || data.isPaying) saver.classList.add('opacity-0', 'pointer-events-none');
-            else saver.classList.remove('opacity-0', 'pointer-events-none');
+            else if (successOverlay.classList.contains('hidden')) saver.classList.remove('opacity-0', 'pointer-events-none');
 
             list.innerHTML = '';
             if (!data.isPaying) {
@@ -989,10 +1087,12 @@
                     });
                 });
 
+                const soldTotal = payTotal;
                 cart = [];
                 updateCartUI();
                 closeModal('paymentModal');
-                toast("Erfolgreich gebucht");
+                showSaleSuccess(soldTotal);
+                syncSaleCompleted(soldTotal);
             } catch (err) {
                 console.error("Verkaufs-Fehler:", err);
                 toast(err.message || "Verkauf fehlgeschlagen");
@@ -1058,17 +1158,21 @@
         }
 
         // --- KASSENSTURZ (Bargeld-Abgleich) ---
+        function fmtEUR(n) {
+            return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+        }
+
         function renderCashReconciliation(totalRevenue) {
             const actualEl = document.getElementById('cashActual');
             const soll = (cashRegister.start || 0) + totalRevenue;
-            document.getElementById('cashSollDisplay').textContent = soll.toFixed(2) + ' €';
+            document.getElementById('cashSollDisplay').textContent = fmtEUR(soll);
 
             const actual = parseFloat(actualEl?.value);
             const diffEl = document.getElementById('cashDiffDisplay');
             if (!isNaN(actual)) {
                 const diff = actual - soll;
-                diffEl.textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2) + ' €';
-                diffEl.className = `text-3xl font-black ${Math.abs(diff) < 0.01 ? 'text-emerald-400' : (diff < 0 ? 'text-rose-500' : 'text-amber-400')}`;
+                diffEl.textContent = (diff >= 0 ? '+' : '') + fmtEUR(diff);
+                diffEl.className = `text-3xl font-black whitespace-nowrap ${Math.abs(diff) < 0.01 ? 'text-emerald-400' : (diff < 0 ? 'text-rose-500' : 'text-amber-400')}`;
             } else {
                 diffEl.textContent = '--';
                 diffEl.className = "text-3xl font-black text-slate-600";
@@ -1300,24 +1404,47 @@
         function renderInventoryList() {
             const list = document.getElementById('inventoryList');
             list.innerHTML = '';
-            Object.keys(inventory).sort().forEach(name => {
-                const item = inventory[name];
-                const div = document.createElement('div');
-                div.className = "bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center";
-                div.innerHTML = `
-                    <div>
-                        <div class="text-white font-bold flex items-center gap-2">${name} <span class="text-[8px] font-bold text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded uppercase tracking-wide">${item.assignedPos === 1 ? 'Getränke' : item.assignedPos === 2 ? 'Speisen' : 'Alle'}</span></div>
-                        <div class="text-[10px] text-slate-500 uppercase">
-                            ${item.hasVariants ? `S: ${item.priceS}€ | L: ${item.priceL}€` : `${item.price}€`}
+
+            const groups = { 0: [], 1: [], 2: [] };
+            Object.keys(inventory).sort().forEach(name => groups[inventory[name].assignedPos || 0].push(name));
+
+            const groupLabels = { 1: 'Getränke', 2: 'Speisen', 0: 'Alle Kassen' };
+            const groupIcons = { 1: 'cup-soda', 2: 'utensils', 0: 'layout-grid' };
+
+            [1, 2, 0].forEach(posKey => {
+                const names = groups[posKey];
+                if (names.length === 0) return;
+
+                const header = document.createElement('div');
+                header.className = "flex items-center gap-2 pt-2 pb-1 first:pt-0";
+                header.innerHTML = `<i data-lucide="${groupIcons[posKey]}" class="w-3.5 h-3.5 text-indigo-400"></i><span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">${groupLabels[posKey]}</span><span class="text-[10px] text-slate-600">(${names.length})</span>`;
+                list.appendChild(header);
+
+                names.forEach(name => {
+                    const item = inventory[name];
+                    const outOfStock = item.hasVariants ? (item.stockS <= 0 && item.stockL <= 0) : (item.stock <= 0);
+                    const div = document.createElement('div');
+                    div.className = `bg-slate-800 p-3.5 rounded-xl border ${outOfStock ? 'border-rose-500/30' : 'border-slate-700'} flex justify-between items-center gap-3`;
+                    div.innerHTML = `
+                        <div class="min-w-0 flex-1">
+                            <div class="text-white font-bold text-sm truncate">${name}</div>
+                            <div class="text-[11px] text-slate-500 font-mono mt-0.5">
+                                ${item.hasVariants ? `S: ${item.priceS}€ · ${item.stockS}x &nbsp;|&nbsp; L: ${item.priceL}€ · ${item.stockL}x` : `${item.price.toFixed(2)}€ · <span class="${outOfStock ? 'text-rose-400 font-bold' : ''}">${item.stock}x</span>`}
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="editProduct('${name}')" class="text-indigo-400 p-2"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                        <button onclick="deleteProduct('${name}')" class="text-rose-500 p-2"><i data-lucide="trash" class="w-4 h-4"></i></button>
-                    </div>
-                `;
-                list.appendChild(div);
+                        <div class="flex gap-1 flex-none">
+                            <button onclick="editProduct('${name}')" class="text-indigo-400 hover:text-indigo-300 p-2 hover:bg-slate-700/50 rounded-lg"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="deleteProduct('${name}')" class="text-rose-500 hover:text-rose-400 p-2 hover:bg-slate-700/50 rounded-lg"><i data-lucide="trash" class="w-4 h-4"></i></button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
             });
+
+            if (Object.keys(inventory).length === 0) {
+                list.innerHTML = `<div class="text-center text-slate-600 text-sm py-10">Noch keine Artikel angelegt.</div>`;
+            }
+
             lucide.createIcons();
         }
 
